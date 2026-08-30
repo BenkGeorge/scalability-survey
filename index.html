@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scalability Assessment — Floating & Amphibious Housing | TU Delft</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0B1D3A;--teal:#0D9488;--teal-light:#14B8A6;--blue:#2563A8;--purple:#7C3AED;--amber:#D97706;--green:#059669;--red:#DC2626;--bg:#F8FAFC;--card:#FFFFFF;--border:#E2E8F0;--text:#1E293B;--muted:#64748B;--light:#F1F5F9}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+.hero{background:linear-gradient(135deg,#0B1D3A 0%,#1E3A5F 40%,#2563A8 100%);color:#fff;padding:60px 24px 50px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='80' height='40' viewBox='0 0 80 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 Q20 8 40 20 Q60 32 80 20' fill='none' stroke='rgba(255,255,255,0.04)' stroke-width='1.5'/%3E%3C/svg%3E") repeat}
+.hero>*{position:relative;z-index:1}
+.hero-badge{display:inline-block;background:rgba(13,148,136,0.3);border:1px solid rgba(13,148,136,0.5);color:#5EEAD4;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px}
+.hero h1{font-size:clamp(22px,4vw,34px);font-weight:800;line-height:1.2;margin-bottom:8px;letter-spacing:-0.5px}
+.hero p{font-size:14px;opacity:0.7;max-width:520px;margin:0 auto 20px}
+.hero-features{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:20px}
+.hero-feat{background:rgba(255,255,255,0.08);border-radius:12px;padding:14px 18px;text-align:center;min-width:100px}
+.hero-feat .icon{font-size:22px;margin-bottom:4px}
+.hero-feat .label{font-size:11px;opacity:0.7}
+.hero-feat .val{font-size:16px;font-weight:700;color:#5EEAD4}
+.tudelft{font-size:12px;opacity:0.5;margin-top:20px}
+
+.progress-wrap{background:#fff;border-bottom:1px solid var(--border);padding:12px 24px;position:sticky;top:0;z-index:100}
+.progress-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.progress-bar{flex:1;height:6px;background:var(--light);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:3px;transition:width 0.4s}
+.progress-text{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap}
+.progress-back{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted)}
+.progress-back:hover{background:var(--light)}
+
+.container{max-width:720px;margin:0 auto;padding:32px 20px}
+.step{display:none;animation:fadeIn 0.3s ease}.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.step-header{margin-bottom:24px}
+.step-number{font-size:12px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.step-title{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-0.3px}
+.step-desc{font-size:14px;color:var(--muted);margin-top:6px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px}
+.card-label{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.card-hint{font-size:12px;color:var(--muted);margin-bottom:12px}
+.card-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:500px){.card-row{grid-template-columns:1fr}}
+
+input[type="text"],input[type="email"],input[type="number"],select,textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,0.1)}
+textarea{resize:vertical;min-height:80px}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2364748B' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:block}.pill input{display:none}
+.pill label{display:block;padding:8px 16px;border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;transition:all 0.2s;font-weight:500;color:var(--muted)}
+.pill input:checked+label{background:var(--teal);color:#fff;border-color:var(--teal);font-weight:600}
+.pill label:hover{border-color:var(--teal);color:var(--teal)}
+
+/* Dimension info card */
+.dim-info{border-radius:12px;padding:16px 18px;margin-bottom:20px;font-size:13px;line-height:1.5}
+.dim-info-h{background:#E6FFFA;border:1px solid #99F6E4;color:#134E4A}
+.dim-info-v{background:#EDE9FE;border:1px solid #C4B5FD;color:#3B1F8B}
+.dim-info strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.dim-info-note{margin-top:10px;padding:10px 14px;background:rgba(255,255,255,0.6);border-radius:8px;font-size:12px;color:var(--muted);border-left:3px solid var(--amber)}
+
+/* Criterion block */
+.criterion{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.criterion-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px}
+.criterion-info{flex:1}
+.criterion-name{font-size:16px;font-weight:700;color:var(--navy)}
+.criterion-def{font-size:13px;color:#475569;margin-top:4px;margin-bottom:16px;line-height:1.5;padding-left:0}
+.dim-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:0.5px;flex-shrink:0;margin-top:2px}
+.dim-h{background:#E6FFFA;color:var(--teal)}
+.dim-v{background:#EDE9FE;color:var(--purple)}
+
+.overall-row{background:var(--light);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.overall-label{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.score-buttons{display:flex;gap:6px}
+.score-btn{flex:1;height:44px;max-width:72px;border:2px solid var(--border);border-radius:10px;background:#fff;font-size:16px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.score-btn:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-1px)}
+.score-btn.selected{background:var(--teal);color:#fff;border-color:var(--teal);transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,0.3)}
+.score-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;padding:0 4px}
+
+.sub-section{margin-top:2px}
+.sub-header{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sub-header .opt{font-weight:400;color:#94A3B8;text-transform:none;letter-spacing:0}
+.sub-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:6px 0;border-bottom:1px solid #F1F5F9}
+.sub-row:last-child{margin-bottom:0;border-bottom:none}
+.sub-label{flex:1;font-size:13px;color:#475569;min-width:0;line-height:1.4}
+.sub-btns{display:flex;gap:4px;flex-shrink:0}
+.sub-btn{width:32px;height:32px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.sub-btn:hover{border-color:var(--teal);color:var(--teal)}
+.sub-btn.selected{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+.btn-row{display:flex;justify-content:flex-end;gap:12px;margin-top:24px}
+.btn{padding:12px 32px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:inherit}
+.btn-primary{background:var(--teal);color:#fff;box-shadow:0 4px 14px rgba(13,148,136,0.3)}
+.btn-primary:hover{background:var(--teal-light);transform:translateY(-1px)}
+
+.radar-wrap{text-align:center;padding:20px 0}
+.radar-wrap svg{max-width:380px;width:100%}
+.scorecard{background:linear-gradient(135deg,#0B1D3A,#1E3A5F);border-radius:16px;padding:32px;color:#fff;margin-bottom:24px}
+.scorecard h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.scorecard .project{font-size:14px;opacity:0.6;margin-bottom:20px}
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.score-box{background:rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center}
+.score-box .val{font-size:32px;font-weight:800}
+.score-box .lbl{font-size:11px;opacity:0.6;text-transform:uppercase;letter-spacing:0.5px}
+.teal-val{color:#5EEAD4}
+.comp-table{width:100%;border-collapse:collapse;font-size:13px}
+.comp-table th{text-align:left;padding:8px 10px;background:var(--light);font-weight:600;color:var(--navy);border-bottom:2px solid var(--border)}
+.comp-table td{padding:7px 10px;border-bottom:1px solid var(--light)}
+.pos{color:var(--green);font-weight:700}.neg{color:var(--red);font-weight:700}.neu{color:var(--muted);font-weight:700}
+
+.submit-area{text-align:center;padding:20px 0}
+.submit-btn{background:var(--teal);color:#fff;padding:16px 48px;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(13,148,136,0.3);transition:all 0.2s}
+.submit-btn:hover{background:var(--teal-light);transform:translateY(-2px)}
+.submit-btn.done{background:var(--green)}
+.submit-note{font-size:12px;color:var(--muted);margin-top:10px}
+.alt-link{text-align:center;margin-top:20px;padding:16px;background:var(--light);border-radius:12px;font-size:13px;color:var(--muted)}
+.alt-link a{color:var(--blue);font-weight:600}
+.req{color:var(--red);font-weight:700}
+.footer{text-align:center;padding:40px 20px;font-size:12px;color:var(--muted)}
+.footer a{color:var(--blue)}
+@media(max-width:500px){.hero{padding:40px 16px 36px}.score-btn{height:40px;font-size:14px}.score-grid{grid-template-columns:1fr}.sub-row{flex-direction:column;align-items:flex-start;gap:4px}}
+</style>
+</head>
+<body>
+
+<div class="hero" id="hero-section">
+  <div class="hero-badge">Phase 2 — Expert Validation Survey</div>
+  <h1>Scalability of Floating &<br>Amphibious Urban Housing</h1>
+  <p>Help us understand what makes floating and amphibious projects scale — and what holds them back.</p>
+  <div class="hero-features">
+    <div class="hero-feat"><div class="icon">📊</div><div class="val">10</div><div class="label">Criteria scored</div></div>
+    <div class="hero-feat"><div class="icon">⏱️</div><div class="val">~15 min</div><div class="label">To complete</div></div>
+    <div class="hero-feat"><div class="icon">🎁</div><div class="val">Scorecard</div><div class="label">Sent to you</div></div>
+  </div>
+  <div class="tudelft">TU Delft — Department of Urbanism — Ben K. George & Nanma Gireesh</div>
+</div>
+
+<div class="progress-wrap" id="progress" style="display:none">
+  <div class="progress-inner">
+    <button class="progress-back" onclick="prevStep()">← Back</button>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <span class="progress-text" id="progress-text"></span>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="step active" id="step-0">
+  <div class="card" style="background:linear-gradient(to right,#E6FFFA,#EFF6FF);border-color:#B2DFDB">
+    <p style="font-size:14px;color:var(--navy)"><strong>What you'll do:</strong> Evaluate <strong>one</strong> floating or amphibious project you're familiar with against 10 scalability criteria (5 horizontal, 5 vertical). Sub-criteria scoring is optional but helps our deeper analysis.</p>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px">🎁 <strong>As a thank you,</strong> we'll send you a personalised scalability scorecard comparing your project to our Phase 1 dataset (15 projects, 5 countries).</p>
+  </div>
+  <div class="card">
+    <p style="font-size:13px;color:var(--muted)"><strong>Please choose a project not in Phase 1:</strong> Sjögången, Villa Näckros, Aquavilla, Imorgon Innovation, Ocean Industries, Beach Pavilion, Amphibious Boulevard, Floating Water Tram, Maasbommel, IJburg, Lofts Nassauhaven, Schoonschip, Drijf in Lelystad, UK Amphibious House, Lake Union Floating Homes.</p>
+  </div>
+  <div class="card"><div class="card-label">Your email <span class="req">*</span></div><div class="card-hint">We'll send your personalised scorecard here</div><input type="email" id="email" placeholder="your@email.com"></div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="nextStep()">Get Started →</button></div>
+</div>
+
+<div class="step" id="step-1">
+  <div class="step-header"><div class="step-number">About You</div><div class="step-title">Professional Background</div></div>
+  <div class="card"><div class="card-label">Primary professional role <span class="req">*</span></div><div class="pills" id="role-pills"></div></div>
+  <div class="card"><div class="card-label">Years of experience <span class="req">*</span></div><div class="pills" id="exp-pills"></div></div>
+  <div class="card"><div class="card-label">Country or region of primary work <span class="req">*</span></div><input type="text" id="country" placeholder="e.g. Netherlands, Southeast Asia"></div>
+  <div class="card"><div class="card-label">Area of expertise <span class="req">*</span></div><div class="pills" id="expertise-pills"></div></div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="nextStep()">Continue →</button></div>
+</div>
+
+<div class="step" id="step-2">
+  <div class="step-header"><div class="step-number">Your Project</div><div class="step-title">Project Details</div><div class="step-desc">The more detail you provide, the richer our analysis.</div></div>
+  <div class="card"><div class="card-label">Project name <span class="req">*</span></div><input type="text" id="projectName" placeholder="e.g. Maldives Floating City"></div>
+  <div class="card"><div class="card-label">Location (City, Country) <span class="req">*</span></div><input type="text" id="location" placeholder="e.g. Malé, Maldives"></div>
+  <div class="card"><div class="card-row">
+    <div><div class="card-label">Project type <span class="req">*</span></div><select id="projectType"><option value="">Select...</option><option>Floating housing</option><option>Amphibious housing</option><option>Mixed-use development</option><option>Infrastructure / public</option><option>Other</option></select></div>
+    <div><div class="card-label">Status <span class="req">*</span></div><select id="projectStatus"><option value="">Select...</option><option>Concept / proposal</option><option>Pilot project</option><option>Implemented</option><option>Replicated / scaled</option><option>Not sure</option></select></div>
+  </div></div>
+  <div class="card"><div class="card-row">
+    <div><div class="card-label">Year completed</div><input type="number" id="year" placeholder="e.g. 2024" min="1990" max="2035"></div>
+    <div><div class="card-label">Number of units <span class="req">*</span></div><select id="units"><option value="">Select...</option><option>1 (single)</option><option>2–10</option><option>11–50</option><option>51–200</option><option>200+</option><option>N/A</option></select></div>
+  </div></div>
+  <div class="card"><div class="card-row">
+    <div><div class="card-label">Site area</div><select id="area"><option value="">Select...</option><option>Less than 0.1 ha</option><option>0.1–1 ha</option><option>1–5 ha</option><option>5–20 ha</option><option>20+ ha</option><option>Not sure</option></select></div>
+    <div><div class="card-label">Total budget (EUR)</div><select id="budget"><option value="">Select...</option><option>&lt; €1M</option><option>€1–10M</option><option>€10–50M</option><option>€50–200M</option><option>&gt; €200M</option><option>Not sure</option></select></div>
+  </div></div>
+  <div class="card"><div class="card-label">Number of users / beneficiaries</div><select id="users"><option value="">Select...</option><option>&lt; 10</option><option>10–50</option><option>50–200</option><option>200–1000</option><option>1000+</option><option>N/A</option></select></div>
+  <div class="card"><div class="card-label">Your relationship to this project <span class="req">*</span></div><div class="pills" id="rel-pills"></div></div>
+  <div class="card"><div class="card-label">Are you affiliated with this project? <span class="req">*</span></div><div class="card-hint">Important for bias control in the research methodology.</div><div class="pills" id="aff-pills"></div></div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="nextStep()">Continue to Scoring →</button></div>
+</div>
+
+<div class="step" id="step-3"></div>
+<div class="step" id="step-4"></div>
+<div class="step" id="step-5"></div>
+<div class="step" id="step-6"></div>
+<div class="step" id="step-7"></div>
+
+<div class="step" id="step-8">
+  <div class="step-header"><div class="step-number">Final Thoughts</div><div class="step-title">Almost done!</div><div class="step-desc">Two optional questions to capture anything we might have missed.</div></div>
+  <div class="card"><div class="card-label">Are there important factors influencing scalability that are not captured by the 10 criteria above?</div><textarea id="missing" placeholder="Any factors we should consider adding..."></textarea></div>
+  <div class="card"><div class="card-label">Any additional comments on the scalability of the project you assessed?</div><textarea id="comments" placeholder="Anything else you'd like to share..."></textarea></div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="nextStep()">See Your Scorecard →</button></div>
+</div>
+
+<div class="step" id="step-9"><div id="scorecard-content"></div>
+  <div class="submit-area"><button class="submit-btn" id="submit-btn" onclick="submitData()">Submit Your Response ✓</button><div class="submit-note">Your data will be prepared for submission. We'll email your full scorecard within 48 hours.</div></div>
+  <div class="alt-link">Prefer a traditional form? <a href="https://docs.google.com/forms/d/1TMfvB-PdJUkytFyY_87Sc6_lwwUQOHRItrgBOF73lXs/edit" target="_blank">Use the Google Form instead</a></div>
+</div>
+
+</div>
+
+<div class="footer">
+  <p>PhD Research — Scalability of Floating and Amphibious Urban Housing</p>
+  <p>Ben K. George & Nanma Gireesh — <a href="mailto:B.K.George@tudelft.nl">B.K.George@tudelft.nl</a> — TU Delft, Department of Urbanism</p>
+</div>
+
+<script>
+const CRITERIA=[
+  {key:'R',name:'Replicability',dim:'H',
+   def:'The project concept and technology can be reproduced elsewhere <strong>in their original form</strong>, without substantive modification. Focus on copy-as-is feasibility: documentation, modularity, and site independence.',
+   subs:[
+     {t:'Documentation completeness',d:'Technical specs, drawings, and manuals available for replication'},
+     {t:'Modularity & standardization of components',d:'Replicable units rather than bespoke, one-off design'},
+     {t:'Independence from site-specific conditions',d:'Works without unusual local prerequisites'},
+   ]},
+  {key:'A',name:'Adaptability',dim:'H',
+   def:'The project concept and technology can be <strong>modified or reconfigured</strong> to fit different geographic, climatic, regulatory, or socio-economic contexts. Focus on modification potential while preserving function.',
+   note:'Replicability and adaptability are distinct. Replicability = reproducing without change. Adaptability = the ability to change while preserving function. A project may score high on one and low on the other.',
+   subs:[
+     {t:'Design flexibility under modification',d:'Form and layout can be adjusted for different contexts'},
+     {t:'Material and technology substitutability',d:'Alternative materials and systems work effectively'},
+     {t:'Responsiveness to different contexts',d:'Adapts to different climatic, regulatory, and socio-cultural settings'},
+   ]},
+  {key:'E',name:'Ease of Implementation',dim:'H',
+   def:'The project can be delivered with <strong>available skills, technology, supply chains, and timelines</strong>.',
+   subs:[
+     {t:'Construction complexity',d:'Simpler construction = higher score'},
+     {t:'Required expertise availability',d:'Less specialised expertise needed = higher score'},
+     {t:'Implementation timeline feasibility',d:'Shorter, more predictable timelines = higher score'},
+     {t:'Supply-chain accessibility',d:'Required components are readily available'},
+   ]},
+  {key:'RE',name:'Resource Efficiency',dim:'H',
+   def:'The project uses <strong>financial, material, and energy resources efficiently</strong> per unit delivered.',
+   subs:[
+     {t:'Cost-effectiveness',d:'Relative to comparable land-based alternatives'},
+     {t:'Material efficiency',d:'Low waste, optimised use of materials'},
+     {t:'Energy performance',d:'Operational energy efficiency'},
+   ]},
+  {key:'CE',name:'Community Engagement',dim:'H',
+   def:'The project <strong>involves and benefits</strong> local communities and stakeholders.',
+   subs:[
+     {t:'Participatory design',d:'Community involved in design decisions'},
+     {t:'Social acceptance',d:'Broader public acceptance of the project'},
+     {t:'User satisfaction',d:'Occupants and users satisfied with the outcome'},
+   ]},
+  {key:'P',name:'Policy & Regulatory Alignment',dim:'V',
+   def:'Existing <strong>policies and regulations actively support</strong> implementation — including zoning, building codes, and permits.',
+   subs:[
+     {t:'Zoning compatibility',d:'Water/land use designation supports the project'},
+     {t:'Building code coverage',d:'Codes accommodate floating/amphibious typologies'},
+     {t:'Permit accessibility',d:'Permits obtainable through standard processes'},
+   ]},
+  {key:'IC',name:'Institutional Commitment',dim:'V',
+   def:'Government agencies and institutions <strong>actively support</strong> the project through political backing, budget allocation, and inter-agency coordination.',
+   subs:[
+     {t:'Political backing',d:'Sustained support from elected officials or leadership'},
+     {t:'Budget allocation',d:'Committed public or institutional funding'},
+     {t:'Inter-agency coordination',d:'Multiple agencies aligned in support'},
+   ]},
+  {key:'St',name:'Standardization',dim:'V',
+   def:'The project follows or contributes to <strong>standardized construction processes, SOPs, technical standards, and quality benchmarks</strong> that enable consistent quality across implementations.',
+   subs:[
+     {t:'Codified construction and operation processes',d:'Documented SOPs ensuring consistent quality'},
+     {t:'Adoption of recognised technical standards',d:'Uses established industry or regulatory standards'},
+     {t:'Defined quality benchmarks',d:'Performance criteria, certifications in place'},
+   ]},
+  {key:'Su',name:'Sustainability Integration',dim:'V',
+   def:'<strong>Environmental sustainability AND long-term financial/operational viability</strong> are integrated into design and operation. Includes both ecological performance (energy, ecology, materials, climate resilience) and longevity (secured funding, maintenance, market demand).',
+   subs:[
+     {t:'Energy performance',d:'Renewables, low operational energy'},
+     {t:'Ecological impact',d:'Biodiversity, water quality, local ecosystems'},
+     {t:'Circular materials use',d:'Reuse, recycling, low embodied carbon'},
+     {t:'Climate resilience',d:'Flood, storm, sea-level rise adaptation'},
+     {t:'Long-term financial/operational viability',d:'Funding secured, maintenance plans, market demand'},
+   ]},
+  {key:'SC',name:'Systematic Coordination',dim:'V',
+   def:'<strong>Cross-sectoral coordination mechanisms AND monitoring & evaluation systems</strong> are in place to support the project — including multi-stakeholder governance, integrated planning, M&E, and knowledge-sharing.',
+   subs:[
+     {t:'Multi-stakeholder governance',d:'Formal arrangements for cross-stakeholder decision-making'},
+     {t:'Integrated planning across sectors',d:'Housing, water, infrastructure planning aligned'},
+     {t:'Knowledge-sharing networks',d:'Between projects, regions, and disciplines'},
+     {t:'Monitoring & evaluation systems',d:'Environmental impact and performance monitoring in place'},
+   ]},
+];
+
+const P1={R:3.27,A:3.93,E:3.40,RE:3.33,CE:3.80,P:3.27,IC:3.47,St:3.33,Su:3.80,SC:3.73};
+const KEYS=CRITERIA.map(c=>c.key);
+const scores={},subScores={};
+let currentStep=0;const totalSteps=10;
+
+function makePills(id,opts,name){document.getElementById(id).innerHTML=opts.map((o,i)=>`<span class="pill"><input type="radio" name="${name}" id="${name}_${i}" value="${o}"><label for="${name}_${i}">${o}</label></span>`).join('')}
+makePills('role-pills',['Researcher / Academic','Architect / Designer','Engineer','Developer / Industry','Policy / Government','Consultant','Other'],'role');
+makePills('exp-pills',['< 5 years','5–10 years','10–20 years','20+ years'],'exp');
+makePills('expertise-pills',['Technical / Design','Policy / Governance','Finance / Development','Research / Academia','Other'],'expertise');
+makePills('rel-pills',['Directly involved','Indirectly involved','Familiar through research','Other'],'rel');
+makePills('aff-pills',['Yes','No'],'aff');
+
+// Build scoring steps
+const groups=[[0,1],[2,3],[4,5],[6,7],[8,9]];
+groups.forEach((g,gi)=>{
+  const el=document.getElementById('step-'+(gi+3));
+  const c1=CRITERIA[g[0]],c2=CRITERIA[g[1]];
+  const isH=c1.dim==='H';
+  const dimLabel=isH?'Horizontal Scalability — Scaling Out':'Vertical Scalability — Scaling Up';
+  const dimDesc=isH
+    ?'Horizontal scaling captures the replication, diffusion, and adaptation of successful innovations across new sites, populations, or geographies.'
+    :'Vertical scaling captures the institutionalisation of innovations into policies, legal frameworks, governance systems, and funding streams.';
+  const dimCls=isH?'dim-info-h':'dim-info-v';
+  
+  let html=`<div class="step-header">
+    <div class="step-number">${dimLabel} — ${gi+1} of 5</div>
+    <div class="step-title">${c1.name} & ${c2.name}</div>
+    <div class="step-desc">Scale: 1 = Very Low / Absent | 2 = Low | 3 = Moderate | 4 = High | 5 = Very High</div>
+  </div>
+  <div class="${dimCls} dim-info"><strong>${dimLabel}</strong>${dimDesc}</div>`;
+
+  [c1,c2].forEach(c=>{
+    const dc=c.dim==='H'?'dim-h':'dim-v';
+    const dt=c.dim==='H'?'HORIZONTAL':'VERTICAL';
+    html+=`<div class="criterion">
+      <div class="criterion-head">
+        <div class="criterion-info"><div class="criterion-name">${c.name} <span class="req">*</span></div></div>
+        <span class="dim-badge ${dc}">${dt}</span>
+      </div>
+      <div class="criterion-def">${c.def}</div>
+      ${c.note?`<div class="dim-info-note">⚠️ ${c.note}</div>`:''}
+      <div class="overall-row">
+        <div class="overall-label">Overall Rating <span class="req">*</span></div>
+        <div class="score-buttons">${[1,2,3,4,5].map(v=>`<button class="score-btn" onclick="setScore('${c.key}',${v},this)">${v}</button>`).join('')}</div>
+        <div class="score-scale"><span>1 = Very Low / Absent</span><span>5 = Very High</span></div>
+      </div>
+      <div class="sub-section">
+        <div class="sub-header">Sub-criteria scores <span class="opt">(optional — helps our deeper analysis)</span></div>
+        ${c.subs.map((s,si)=>`<div class="sub-row">
+          <span class="sub-label"><strong>${s.t}</strong><br><span style="font-size:11px;color:var(--muted)">${s.d}</span></span>
+          <div class="sub-btns">${[1,2,3,4,5].map(v=>`<button class="sub-btn" onclick="setSubScore('${c.key}',${si},${v},this)">${v}</button>`).join('')}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  html+=`<div class="btn-row"><button class="btn btn-primary" onclick="nextStep()">Continue →</button></div>`;
+  el.innerHTML=html;
+});
+
+function setScore(k,v,btn){scores[k]=v;btn.parentElement.querySelectorAll('.score-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected')}
+function setSubScore(k,i,v,btn){if(!subScores[k])subScores[k]={};subScores[k][i]=v;btn.parentElement.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected')}
+
+function showStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step-'+n).classList.add('active');
+  currentStep=n;
+  const prog=document.getElementById('progress');
+  if(n===0){prog.style.display='none';document.getElementById('hero-section').style.display=''}
+  else{prog.style.display='';document.getElementById('hero-section').style.display='none'}
+  document.getElementById('progress-fill').style.width=Math.round(n/totalSteps*100)+'%';
+  const labels=['','About You','Your Project','Scoring 1/5','Scoring 2/5','Scoring 3/5','Scoring 4/5','Scoring 5/5','Final Thoughts','Your Scorecard'];
+  document.getElementById('progress-text').textContent=labels[n]||'';
+  if(n===9)generateScorecard();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function nextStep(){showStep(currentStep+1)}
+function prevStep(){if(currentStep>0)showStep(currentStep-1)}
+
+function generateRadarSVG(us,p1,sz){
+  const cx=sz/2,cy=sz/2,maxR=sz/2-40,n=KEYS.length,step=2*Math.PI/n;
+  const pt=(i,v)=>{const a=i*step-Math.PI/2,r=v/5*maxR;return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
+  let svg=`<svg viewBox="0 0 ${sz} ${sz+20}" xmlns="http://www.w3.org/2000/svg">`;
+  [1,2,3,4,5].forEach(v=>{const r=v/5*maxR;svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="0.5"/>`});
+  for(let i=0;i<n;i++){const[x,y]=pt(i,5);svg+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#E2E8F0" stroke-width="0.5"/>`}
+  svg+=`<polygon points="${KEYS.map((k,i)=>pt(i,p1[k]).join(',')).join(' ')}" fill="rgba(37,99,168,0.08)" stroke="#2563A8" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  svg+=`<polygon points="${KEYS.map((k,i)=>pt(i,us[k]||0).join(',')).join(' ')}" fill="rgba(13,148,136,0.12)" stroke="#0D9488" stroke-width="2.5"/>`;
+  KEYS.forEach((k,i)=>{const[x,y]=pt(i,us[k]||0);svg+=`<circle cx="${x}" cy="${y}" r="4" fill="#0D9488"/>`});
+  const sl=['R','A','E','RE','CE','P','IC','St','Su','SC'];
+  KEYS.forEach((k,i)=>{const[x,y]=pt(i,5.6);svg+=`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" font-family="Inter,Arial" fill="#374151" font-weight="600">${sl[i]}</text>`});
+  const ly=sz+8;
+  svg+=`<rect x="${cx-120}" y="${ly}" width="10" height="10" rx="2" fill="rgba(13,148,136,0.3)" stroke="#0D9488"/>`;
+  svg+=`<text x="${cx-106}" y="${ly+9}" font-size="10" font-family="Inter,Arial" fill="#64748B">Your Project</text>`;
+  svg+=`<rect x="${cx+20}" y="${ly}" width="10" height="10" rx="2" fill="rgba(37,99,168,0.15)" stroke="#2563A8" stroke-dasharray="3,2"/>`;
+  svg+=`<text x="${cx+34}" y="${ly+9}" font-size="10" font-family="Inter,Arial" fill="#64748B">Phase 1 Avg (n=15)</text>`;
+  return svg+'</svg>';
+}
+
+function generateScorecard(){
+  const pName=document.getElementById('projectName').value||'Your Project';
+  const hK=['R','A','E','RE','CE'],vK=['P','IC','St','Su','SC'];
+  const hT=hK.reduce((s,k)=>s+(scores[k]||0),0),vT=vK.reduce((s,k)=>s+(scores[k]||0),0),total=hT+vT;
+  const p1T=Object.values(P1).reduce((a,b)=>a+b,0);
+  const sorted=[...KEYS].sort((a,b)=>(scores[b]||0)-(scores[a]||0));
+  const gn=k=>CRITERIA.find(c=>c.key===k).name;
+  let rows=KEYS.map(k=>{const v=scores[k]||0,p=P1[k],d=v-p;const cls=d>0?'pos':d<0?'neg':'neu';const dim=hK.includes(k)?'H':'V';
+    return`<tr><td>${gn(k)}</td><td style="text-align:center"><span class="dim-badge dim-${dim.toLowerCase()}">${dim}</span></td><td style="text-align:center;font-weight:700;color:var(--teal)">${v}</td><td style="text-align:center;color:var(--muted)">${p.toFixed(1)}</td><td style="text-align:center" class="${cls}">${d>0?'+':''}${d.toFixed(1)}</td></tr>`}).join('');
+  document.getElementById('scorecard-content').innerHTML=`
+    <div class="scorecard"><h2>Your Scalability Scorecard</h2><div class="project">${pName}</div>
+      <div class="score-grid">
+        <div class="score-box"><div class="val teal-val">${total}<span style="font-size:16px;opacity:0.5">/50</span></div><div class="lbl">Total</div></div>
+        <div class="score-box"><div class="val" style="color:#93C5FD">${hT}<span style="font-size:16px;opacity:0.5">/25</span></div><div class="lbl">Horizontal</div></div>
+        <div class="score-box"><div class="val" style="color:#C4B5FD">${vT}<span style="font-size:16px;opacity:0.5">/25</span></div><div class="lbl">Vertical</div></div>
+      </div></div>
+    <div class="card"><h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px">Scalability Profile</h3><div class="radar-wrap">${generateRadarSVG(scores,P1,380)}</div></div>
+    <div class="card"><h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px">Criterion Comparison</h3>
+      <table class="comp-table"><tr><th>Criterion</th><th style="text-align:center">Dim</th><th style="text-align:center;color:var(--teal)">You</th><th style="text-align:center;color:var(--muted)">P1 Avg</th><th style="text-align:center">Diff</th></tr>${rows}</table></div>
+    <div class="card" style="background:var(--light)">
+      <p style="font-size:13px"><strong style="color:var(--green)">Top strengths:</strong> ${sorted.slice(0,3).map(k=>gn(k)+' ('+scores[k]+')').join(', ')}</p>
+      <p style="font-size:13px;margin-top:4px"><strong style="color:var(--amber)">Areas for attention:</strong> ${sorted.slice(-3).map(k=>gn(k)+' ('+(scores[k]||0)+')').join(', ')}</p></div>`;
+}
+
+function submitData(){
+  const gv=id=>{const e=document.getElementById(id);return e?e.value:''};
+  const gr=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:''};
+  const data={timestamp:new Date().toISOString(),email:gv('email'),role:gr('role'),experience:gr('exp'),country:gv('country'),expertise:gr('expertise'),projectName:gv('projectName'),location:gv('location'),projectType:gv('projectType'),projectStatus:gv('projectStatus'),year:gv('year'),units:gv('units'),area:gv('area'),budget:gv('budget'),users:gv('users'),relationship:gr('rel'),affiliated:gr('aff')};
+  KEYS.forEach(k=>{data[k+'_overall']=scores[k]||''});
+  CRITERIA.forEach(c=>{c.subs.forEach((s,i)=>{data[c.key+'_sub'+(i+1)]=subScores[c.key]?.[i]||''})});
+  data.missing=gv('missing');data.comments=gv('comments');
+  const vals=Object.values(data);const csv=Object.keys(data).join('\t')+'\n'+vals.map(v=>v||'').join('\t');
+  navigator.clipboard.writeText(csv).then(()=>{
+    const btn=document.getElementById('submit-btn');btn.textContent='✓ Copied! Email to B.K.George@tudelft.nl';btn.classList.add('done');
+    const subj=encodeURIComponent('Survey Response: '+(data.projectName||'Project'));
+    const body=encodeURIComponent('Hi Ben,\n\nPlease find my survey response below (tab-separated — paste into spreadsheet):\n\n'+csv+'\n\nBest regards');
+    setTimeout(()=>{document.querySelector('.submit-area').innerHTML+=`
+      <div style="margin-top:16px"><a href="mailto:B.K.George@tudelft.nl?subject=${subj}&body=${body}" class="submit-btn" style="display:inline-block;text-decoration:none;padding:14px 36px;font-size:14px">Open Email →</a></div>
+      <div style="margin-top:24px;padding:24px;background:#ECFDF5;border-radius:14px;text-align:center">
+        <div style="font-size:36px;margin-bottom:8px">🎉</div>
+        <h3 style="font-size:18px;color:var(--navy)">Thank you!</h3>
+        <p style="font-size:13px;color:var(--muted);margin-top:4px">Your personalised scorecard will be emailed within 48 hours.</p></div>`},300);
+  });
+}
+showStep(0);
+</script>
+</body>
+</html>
