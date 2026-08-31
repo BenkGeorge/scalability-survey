@@ -198,14 +198,52 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 <div class="step" id="step-6"></div>
 <div class="step" id="step-7"></div>
 
+
 <div class="step" id="step-8">
+  <div class="step-header">
+    <div class="step-number">Bonus round — 2 minutes</div>
+    <div class="step-title">Score a well-known project</div>
+    <div class="step-desc">To validate the framework, we'd like you to also score one project from our Phase 1 dataset that you're familiar with. This lets us directly compare expert and researcher scores on the same project.</div>
+  </div>
+  <div class="card" style="background:linear-gradient(to right,#E6FFFA,#EFF6FF);border-color:#B2DFDB">
+    <p style="font-size:13px;color:var(--navy)"><strong>Why this matters:</strong> If both you and our researcher scored the same project, we can measure how consistent the framework is across different assessors — this is critical for validating the methodology.</p>
+    <p style="font-size:12px;color:var(--muted);margin-top:6px">This section is optional but very valuable for the research.</p>
+  </div>
+  <div class="card">
+    <div class="card-label">Select a Phase 1 project you know well enough to score</div>
+    <select id="p1Project" onchange="toggleP1Scoring()">
+      <option value="">Select a project...</option>
+      <option value="skip">Skip — I don't know any of these well enough</option>
+      <option value="IJburg Floating Houses">IJburg Floating Houses (Amsterdam, Netherlands)</option>
+      <option value="Schoonschip">Schoonschip (Amsterdam, Netherlands)</option>
+      <option value="Maasbommel">Maasbommel Amphibious Houses (Netherlands)</option>
+      <option value="Lofts Nassauhaven">Lofts Nassauhaven (Rotterdam, Netherlands)</option>
+      <option value="Drijf in Lelystad">Drijf in Lelystad (Netherlands)</option>
+      <option value="UK Amphibious House">UK First Amphibious House (Marlow, UK)</option>
+      <option value="Lake Union Floating Homes">Lake Union Floating Homes (Seattle, USA)</option>
+      <option value="Beach Pavilion">Beach Pavilion (Szczecin, Poland)</option>
+      <option value="Aquavilla">Aquavilla (Malmö, Sweden)</option>
+      <option value="Sjögången">Sjögången (Gothenburg, Sweden)</option>
+    </select>
+  </div>
+  <div id="p1-scoring" style="display:none">
+    <div class="card">
+      <div class="card-label" style="margin-bottom:4px">Rate this project on the same 10 criteria</div>
+      <div class="card-hint">Overall ratings only — same 1–5 scale as before</div>
+      <div id="p1-criteria-list"></div>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="nextStep()">Continue →</button></div>
+</div>
+
+<div class="step" id="step-9">
   <div class="step-header"><div class="step-number">Final Thoughts</div><div class="step-title">Almost done!</div><div class="step-desc">Two optional questions to capture anything we might have missed.</div></div>
   <div class="card"><div class="card-label">Are there important factors influencing scalability that are not captured by the 10 criteria above?</div><textarea id="missing" placeholder="Any factors we should consider adding..."></textarea></div>
   <div class="card"><div class="card-label">Any additional comments on the scalability of the project you assessed?</div><textarea id="comments" placeholder="Anything else you'd like to share..."></textarea></div>
   <div class="btn-row"><button class="btn btn-primary" onclick="nextStep()">See Your Scorecard →</button></div>
 </div>
 
-<div class="step" id="step-9"><div id="scorecard-content"></div>
+<div class="step" id="step-10"><div id="scorecard-content"></div>
   <div class="submit-area"><button class="submit-btn" id="submit-btn" onclick="submitData()">Submit Your Response ✓</button><div class="submit-note">Your data will be prepared for submission. We'll email your full scorecard within 48 hours.</div></div>
   <div class="alt-link">Prefer a traditional form? <a href="https://docs.google.com/forms/d/1TMfvB-PdJUkytFyY_87Sc6_lwwUQOHRItrgBOF73lXs/edit" target="_blank">Use the Google Form instead</a></div>
 </div>
@@ -299,7 +337,7 @@ const CRITERIA=[
 const P1={R:3.27,A:3.93,E:3.40,RE:3.33,CE:3.80,P:3.27,IC:3.47,St:3.33,Su:3.80,SC:3.73};
 const KEYS=CRITERIA.map(c=>c.key);
 const scores={},subScores={};
-let currentStep=0;const totalSteps=10;
+let currentStep=0;const totalSteps=11;
 
 function makePills(id,opts,name){document.getElementById(id).innerHTML=opts.map((o,i)=>`<span class="pill"><input type="radio" name="${name}" id="${name}_${i}" value="${o}"><label for="${name}_${i}">${o}</label></span>`).join('')}
 makePills('role-pills',['Researcher / Academic','Architect / Designer','Engineer','Developer / Industry','Policy / Government','Consultant','Other'],'role');
@@ -366,9 +404,9 @@ function showStep(n){
   if(n===0){prog.style.display='none';document.getElementById('hero-section').style.display=''}
   else{prog.style.display='';document.getElementById('hero-section').style.display='none'}
   document.getElementById('progress-fill').style.width=Math.round(n/totalSteps*100)+'%';
-  const labels=['','About You','Your Project','Scoring 1/5','Scoring 2/5','Scoring 3/5','Scoring 4/5','Scoring 5/5','Final Thoughts','Your Scorecard'];
+  const labels=['','About You','Your Project','Scoring 1/5','Scoring 2/5','Scoring 3/5','Scoring 4/5','Scoring 5/5','Reference Project','Final Thoughts','Your Scorecard'];
   document.getElementById('progress-text').textContent=labels[n]||'';
-  if(n===9)generateScorecard();
+  if(n===10)generateScorecard();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function nextStep(){showStep(currentStep+1)}
@@ -424,6 +462,8 @@ function submitData(){
   KEYS.forEach(k=>{data[k+'_overall']=scores[k]||''});
   CRITERIA.forEach(c=>{c.subs.forEach((s,i)=>{data[c.key+'_sub'+(i+1)]=subScores[c.key]?.[i]||''})});
   data.missing=gv('missing');data.comments=gv('comments');
+  data.p1_reference_project=gv('p1Project');
+  KEYS.forEach(k=>{data['p1_'+k]=p1Scores[k]||''});
   const vals=Object.values(data);const csv=Object.keys(data).join('\t')+'\n'+vals.map(v=>v||'').join('\t');
   navigator.clipboard.writeText(csv).then(()=>{
     const btn=document.getElementById('submit-btn');btn.textContent='✓ Copied! Email to B.K.George@tudelft.nl';btn.classList.add('done');
@@ -437,6 +477,29 @@ function submitData(){
         <p style="font-size:13px;color:var(--muted);margin-top:4px">Your personalised scorecard will be emailed within 48 hours.</p></div>`},300);
   });
 }
+
+const p1Scores={};
+const P1_REF=[
+  {key:'R',name:'Replicability'},{key:'A',name:'Adaptability'},
+  {key:'E',name:'Ease of implementation'},{key:'RE',name:'Resource efficiency'},
+  {key:'CE',name:'Community engagement'},{key:'P',name:'Policy & regulatory alignment'},
+  {key:'IC',name:'Institutional commitment'},{key:'St',name:'Standardization'},
+  {key:'Su',name:'Sustainability integration'},{key:'SC',name:'Systematic coordination'},
+];
+const p1El=document.getElementById('p1-criteria-list');
+if(p1El){
+  const dimH=['R','A','E','RE','CE'];
+  p1El.innerHTML=P1_REF.map(c=>{
+    const isH=dimH.includes(c.key);
+    const badge=isH?'<span class="dim-badge dim-h" style="font-size:9px;padding:1px 6px">H</span>':'<span class="dim-badge dim-v" style="font-size:9px;padding:1px 6px">V</span>';
+    return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 0;border-bottom:1px solid var(--light)">
+      <span style="flex:1;font-size:13px;font-weight:500;color:var(--navy)">${badge} ${c.name}</span>
+      <div style="display:flex;gap:4px">${[1,2,3,4,5].map(v=>`<button class="sub-btn" onclick="setP1('${c.key}',${v},this)" style="width:36px;height:36px">${v}</button>`).join('')}</div>
+    </div>`}).join('');
+}
+function toggleP1Scoring(){const s=document.getElementById('p1Project').value;const d=document.getElementById('p1-scoring');if(d)d.style.display=(s&&s!=='skip')?'block':'none'}
+function setP1(k,v,btn){p1Scores[k]=v;btn.parentElement.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected')}
+
 showStep(0);
 </script>
 </body>
