@@ -455,6 +455,9 @@ function generateScorecard(){
       <p style="font-size:13px;margin-top:4px"><strong style="color:var(--amber)">Areas for attention:</strong> ${sorted.slice(-3).map(k=>gn(k)+' ('+(scores[k]||0)+')').join(', ')}</p></div>`;
 }
 
+// Google Sheets endpoint — data goes directly to your spreadsheet
+const SUBMIT_URL='https://script.google.com/macros/s/AKfycbwd75lCWAHvE1RuTl5lhrGWlaDtPLVRe6hUebZBFbmy6dlYTAg7jP3DLmn-Aq7foz4E/exec';
+
 function submitData(){
   const gv=id=>{const e=document.getElementById(id);return e?e.value:''};
   const gr=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:''};
@@ -464,17 +467,36 @@ function submitData(){
   data.missing=gv('missing');data.comments=gv('comments');
   data.p1_reference_project=gv('p1Project');
   KEYS.forEach(k=>{data['p1_'+k]=p1Scores[k]||''});
-  const vals=Object.values(data);const csv=Object.keys(data).join('\t')+'\n'+vals.map(v=>v||'').join('\t');
-  navigator.clipboard.writeText(csv).then(()=>{
-    const btn=document.getElementById('submit-btn');btn.textContent='✓ Copied! Email to B.K.George@tudelft.nl';btn.classList.add('done');
-    const subj=encodeURIComponent('Survey Response: '+(data.projectName||'Project'));
-    const body=encodeURIComponent('Hi Ben,\n\nPlease find my survey response below (tab-separated — paste into spreadsheet):\n\n'+csv+'\n\nBest regards');
-    setTimeout(()=>{document.querySelector('.submit-area').innerHTML+=`
-      <div style="margin-top:16px"><a href="mailto:B.K.George@tudelft.nl?subject=${subj}&body=${body}" class="submit-btn" style="display:inline-block;text-decoration:none;padding:14px 36px;font-size:14px">Open Email →</a></div>
-      <div style="margin-top:24px;padding:24px;background:#ECFDF5;border-radius:14px;text-align:center">
-        <div style="font-size:36px;margin-bottom:8px">🎉</div>
-        <h3 style="font-size:18px;color:var(--navy)">Thank you!</h3>
-        <p style="font-size:13px;color:var(--muted);margin-top:4px">Your personalised scorecard will be emailed within 48 hours.</p></div>`},300);
+
+  const btn=document.getElementById('submit-btn');
+  btn.textContent='Submitting...';
+  btn.disabled=true;
+
+  fetch(SUBMIT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+  .then(()=>{
+    btn.textContent='\u2713 Submitted successfully!';
+    btn.classList.add('done');
+    document.querySelector('.submit-area').innerHTML+=`
+      <div style="margin-top:24px;padding:28px;background:#ECFDF5;border-radius:14px;text-align:center">
+        <div style="font-size:42px;margin-bottom:10px">\ud83c\udf89</div>
+        <h3 style="font-size:20px;color:var(--navy)">Thank you for your expert input!</h3>
+        <p style="font-size:14px;color:var(--muted);margin-top:6px">Your response has been recorded. We will send your personalised scalability scorecard to <strong>`+data.email+`</strong> within 48 hours.</p>
+      </div>`;
+  })
+  .catch(()=>{
+    const vals=Object.values(data);
+    const csv=Object.keys(data).join('\t')+'\n'+vals.map(v=>v||'').join('\t');
+    navigator.clipboard.writeText(csv);
+    btn.textContent='\u2713 Copied to clipboard';
+    btn.classList.add('done');
+    btn.disabled=false;
+    const subj=encodeURIComponent('Survey Response: '+(data.projectName||''));
+    const body=encodeURIComponent('Hi Ben,\nSurvey response (tab-separated):\n\n'+csv+'\nBest regards');
+    document.querySelector('.submit-area').innerHTML+=`
+      <div style="margin-top:16px;padding:20px;background:#FEF3E2;border-radius:14px;text-align:center">
+        <p style="font-size:14px;color:#92400E"><strong>Response copied!</strong> Please email it to complete:</p>
+        <a href="mailto:B.K.George@tudelft.nl?subject=`+subj+`&body=`+body+`" class="submit-btn" style="display:inline-block;text-decoration:none;padding:14px 36px;font-size:14px;margin-top:12px">Open Email \u2192</a>
+      </div>`;
   });
 }
 
