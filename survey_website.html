@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scalability of Floating &amp; Amphibious Urban Developments | TU Delft</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0B1D3A;--teal:#0D9488;--teal-l:#14B8A6;--blue:#2563A8;--purple:#7C3AED;--purple-l:#8B5CF6;--amber:#D97706;--green:#059669;--red:#DC2626;--bg:#F8FAFC;--card:#fff;--bd:#E2E8F0;--tx:#1E293B;--mu:#64748B;--lt:#F1F5F9}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+.hero{background:linear-gradient(135deg,#0B1D3A 0%,#1E3A5F 40%,#2563A8 100%);color:#fff;padding:56px 24px 48px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='80' height='40' viewBox='0 0 80 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 Q20 8 40 20 Q60 32 80 20' fill='none' stroke='rgba(255,255,255,0.04)' stroke-width='1.5'/%3E%3C/svg%3E") repeat}
+.hero>*{position:relative;z-index:1}
+.hero-badge{display:inline-block;background:rgba(13,148,136,.3);border:1px solid rgba(13,148,136,.5);color:#5EEAD4;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px}
+.hero h1{font-size:clamp(21px,4vw,33px);font-weight:800;line-height:1.2;margin-bottom:8px;letter-spacing:-.5px}
+.hero p{font-size:14px;opacity:.72;max-width:530px;margin:0 auto 20px}
+.hero-f{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px}
+.hf{background:rgba(255,255,255,.08);border-radius:12px;padding:13px 18px;text-align:center;min-width:96px}
+.hf .i{font-size:21px;margin-bottom:3px}
+.hf .v{font-size:15px;font-weight:700;color:#5EEAD4}
+.hf .l{font-size:10.5px;opacity:.7}
+.tud{font-size:12px;opacity:.55;margin-top:20px}
+
+.pw{background:#fff;border-bottom:1px solid var(--bd);padding:11px 24px;position:sticky;top:0;z-index:100}
+.pi{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.pbar{flex:1;height:6px;background:var(--lt);border-radius:3px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:3px;transition:width .4s}
+.ptx{font-size:12px;color:var(--mu);font-weight:500;white-space:nowrap}
+.pback{background:none;border:1px solid var(--bd);border-radius:8px;padding:6px 13px;font-size:12px;font-weight:500;cursor:pointer;color:var(--mu)}
+.pback:hover{background:var(--lt)}
+
+.wrap{max-width:760px;margin:0 auto;padding:30px 20px}
+.step{display:none;animation:fi .3s ease}.step.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sh{margin-bottom:22px}
+.sn{font-size:12px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.st{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+.sd{font-size:14px;color:var(--mu);margin-top:6px}
+
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;margin-bottom:16px}
+.cl{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.ch{font-size:12px;color:var(--mu);margin-bottom:11px}
+.cr{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:540px){.cr{grid-template-columns:1fr}}
+
+input[type=text],input[type=email],input[type=number],select,textarea{width:100%;padding:10px 13px;border:1px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+textarea{resize:vertical;min-height:82px}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2364748B' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:block}.pill input{display:none}
+.pill label{display:block;padding:8px 15px;border:1px solid var(--bd);border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;font-weight:500;color:var(--mu)}
+.pill input:checked+label{background:var(--teal);color:#fff;border-color:var(--teal);font-weight:600}
+.pill label:hover{border-color:var(--teal);color:var(--teal)}
+.pill input:checked+label:hover{color:#fff}
+
+.dim-info{border-radius:12px;padding:15px 17px;margin-bottom:20px;font-size:13px;line-height:1.5}
+.di-h{background:#E6FFFA;border:1px solid #99F6E4;color:#134E4A}
+.di-v{background:#EDE9FE;border:1px solid #C4B5FD;color:#3B1F8B}
+.dim-info strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.note{margin-top:10px;padding:10px 13px;background:rgba(255,255,255,.65);border-radius:8px;font-size:12px;color:var(--mu);border-left:3px solid var(--amber)}
+
+.crit{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;margin-bottom:20px}
+.crit-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:3px}
+.crit-n{font-size:16px;font-weight:700;color:var(--navy)}
+.crit-d{font-size:13px;color:#475569;margin-top:4px;margin-bottom:15px;line-height:1.5}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.5px;flex-shrink:0;margin-top:2px}
+.b-h{background:#E6FFFA;color:var(--teal)}
+.b-v{background:#EDE9FE;color:var(--purple)}
+
+.ov{background:var(--lt);border-radius:10px;padding:13px 15px;margin-bottom:13px}
+.ovl{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.sb{display:flex;gap:6px}
+.sbtn{flex:1;height:52px;border:2px solid var(--bd);border-radius:10px;background:#fff;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px}
+.sbtn .n{font-size:16px;font-weight:700;color:var(--mu);line-height:1}
+.sbtn .t{font-size:8.5px;color:var(--mu);line-height:1.1;text-align:center}
+.sbtn:hover{border-color:var(--teal);transform:translateY(-1px)}
+.sbtn:hover .n,.sbtn:hover .t{color:var(--teal)}
+.sbtn.sel{background:var(--teal);border-color:var(--teal);transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.3)}
+.sbtn.sel .n,.sbtn.sel .t{color:#fff}
+.sbtn.p4.sel{background:var(--purple);border-color:var(--purple);box-shadow:0 4px 12px rgba(124,58,237,.3)}
+.sbtn.p4:hover{border-color:var(--purple)}
+.sbtn.p4:hover .n,.sbtn.p4:hover .t{color:var(--purple)}
+.sbtn.p4.sel:hover .n,.sbtn.p4.sel:hover .t{color:#fff}
+
+.subs{margin-top:2px}
+.subh{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.subh .o{font-weight:400;color:#94A3B8;text-transform:none;letter-spacing:0}
+.srow{display:flex;align-items:center;gap:10px;margin-bottom:7px;padding:6px 0;border-bottom:1px solid #F1F5F9}
+.srow:last-child{margin-bottom:0;border-bottom:none}
+.slab{flex:1;font-size:13px;color:#475569;min-width:0;line-height:1.35}
+.slab .d{font-size:11px;color:var(--mu);display:block}
+.sbtns{display:flex;gap:4px;flex-shrink:0}
+.mini{width:34px;height:34px;border:1.5px solid var(--bd);border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:var(--mu);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.mini:hover{border-color:var(--teal);color:var(--teal)}
+.mini.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
+.mini.p4:hover{border-color:var(--purple);color:var(--purple)}
+.mini.p4.sel{background:var(--purple);border-color:var(--purple);color:#fff}
+
+.fgroup{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;margin-bottom:18px}
+.fg-h{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.fg-s{font-size:12px;color:var(--mu);margin-bottom:14px}
+.scale-key{display:flex;gap:4px;margin-bottom:12px;padding:9px 11px;background:#FAF5FF;border:1px solid #E9D5FF;border-radius:9px;font-size:10.5px;color:#6B21A8;flex-wrap:wrap}
+.scale-key b{font-weight:700}
+
+.btnrow{display:flex;justify-content:space-between;gap:12px;margin-top:22px;align-items:center}
+.btn{padding:12px 30px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:inherit}
+.btn-p{background:var(--teal);color:#fff;box-shadow:0 4px 14px rgba(13,148,136,.3)}
+.btn-p:hover{background:var(--teal-l);transform:translateY(-1px)}
+.btn-s{background:var(--lt);color:var(--mu)}
+.btn-s:hover{background:#E2E8F0}
+.skipnote{font-size:12px;color:var(--mu);font-style:italic}
+
+.radar{text-align:center;padding:18px 0}
+.radar svg{max-width:380px;width:100%}
+.scorecard{background:linear-gradient(135deg,#0B1D3A,#1E3A5F);border-radius:16px;padding:30px;color:#fff;margin-bottom:22px}
+.scorecard h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.scorecard .pj{font-size:14px;opacity:.6;margin-bottom:19px}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.sbox{background:rgba(255,255,255,.08);border-radius:12px;padding:15px;text-align:center}
+.sbox .v{font-size:31px;font-weight:800}
+.sbox .l{font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.5px}
+.tv{color:#5EEAD4}
+table.cmp{width:100%;border-collapse:collapse;font-size:13px}
+table.cmp th{text-align:left;padding:8px 10px;background:var(--lt);font-weight:600;color:var(--navy);border-bottom:2px solid var(--bd)}
+table.cmp td{padding:7px 10px;border-bottom:1px solid var(--lt)}
+.pos{color:var(--green);font-weight:700}.neg{color:var(--red);font-weight:700}.neu{color:var(--mu);font-weight:700}
+
+.sub-area{text-align:center;padding:18px 0}
+.subbtn{background:var(--teal);color:#fff;padding:15px 44px;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(13,148,136,.3);transition:all .2s}
+.subbtn:hover{background:var(--teal-l);transform:translateY(-2px)}
+.subbtn.done{background:var(--green)}
+.subnote{font-size:12px;color:var(--mu);margin-top:10px}
+.resp-box{width:100%;min-height:150px;font-family:ui-monospace,Consolas,monospace;font-size:10.5px;margin-top:14px;background:#F8FAFC}
+.req{color:var(--red);font-weight:700}
+.card.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.08)}
+.crit.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.08)}
+.errmsg{background:#FEE2E2;color:#991B1B;border-radius:10px;padding:11px 14px;font-size:13px;margin-bottom:14px;display:none}
+.errmsg.on{display:block}
+.foot{text-align:center;padding:36px 20px;font-size:12px;color:var(--mu)}
+.foot a{color:var(--blue)}
+@media(max-width:540px){
+ .hero{padding:38px 16px 34px}
+ .sbtn{height:48px}.sbtn .n{font-size:14px}.sbtn .t{font-size:7.5px}
+ .sgrid{grid-template-columns:1fr}
+ .srow{flex-direction:column;align-items:flex-start;gap:5px}
+ .mini{width:30px;height:30px}
+}
+</style>
+</head>
+<body>
+
+<div class="hero" id="hero">
+  <div class="hero-badge">Phase 2 — Expert Validation Survey</div>
+  <h1>Scalability of Floating &amp;<br>Amphibious Urban Housing</h1>
+  <p>Help us understand what makes floating and amphibious projects scale — and what holds them back.</p>
+  <div class="hero-f">
+    <div class="hf"><div class="i">📊</div><div class="v">10 + 41</div><div class="l">Criteria &amp; factors</div></div>
+    <div class="hf"><div class="i">⏱️</div><div class="v">~25 min</div><div class="l">To complete</div></div>
+    <div class="hf"><div class="i">🎁</div><div class="v">Scorecard</div><div class="l">Yours at the end</div></div>
+  </div>
+  <div class="tud">TU Delft · Department of Urbanism · Ben K. George &amp; Nanma Gireesh</div>
+</div>
+
+<div class="pw" id="prog" style="display:none">
+  <div class="pi">
+    <button class="pback" onclick="prev()">← Back</button>
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    <span class="ptx" id="ptx"></span>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="errmsg" id="errbanner"></div>
+
+<!-- ═══ STEP 0 — WELCOME & CONSENT ═══ -->
+<div class="step active" id="s0">
+  <div class="card" style="background:linear-gradient(to right,#E6FFFA,#EFF6FF);border-color:#B2DFDB">
+    <p style="font-size:14px;color:var(--navy)"><strong>What you'll do:</strong> Describe <strong>one</strong> floating or amphibious project you know well, rate it against ten scalability criteria, and rate how relevant a set of regulatory factors were.</p>
+    <p style="font-size:13px;color:var(--mu);margin-top:8px">🎁 <strong>At the end</strong> you'll see a personalised scorecard comparing your project to our Phase 1 dataset of 15 projects across 5 countries.</p>
+    <p style="font-size:13px;color:var(--mu);margin-top:8px">You do <strong>not</strong> need to give your name or any contact details to take part.</p>
+  </div>
+  <div class="card">
+    <p style="font-size:13px;color:var(--mu)"><strong>Please choose a project not in Phase 1:</strong> Sjögången, Villa Näckros, Aquavilla, Imorgon Innovation, Ocean Industries, Beach Pavilion, Amphibious Boulevard, Floating Water Tram, Maasbommel, IJburg, Lofts Nassauhaven, Schoonschip, Drijf in Lelystad, UK Amphibious House, Lake Union Floating Homes.</p>
+  </div>
+
+  <div class="sh" style="margin-top:26px"><div class="sn">Consent</div><div class="st">Before you begin</div></div>
+  <div class="card">
+    <div class="cl">I have read and understood the participant information dated 15/09/2026, and I consent voluntarily to take part. I understand I can skip any question and stop at any time. <span class="req">*</span></div>
+    <div class="pills" id="c1-pills"></div>
+  </div>
+  <div class="card">
+    <div class="cl">I understand my responses will be used in two doctoral studies at TU Delft and published in de-identified, aggregated form. <span class="req">*</span></div>
+    <div class="pills" id="c2-pills"></div>
+  </div>
+  <div class="card">
+    <div class="cl">I agree that my responses may be quoted anonymously in research outputs.</div>
+    <div class="pills" id="c3-pills"></div>
+  </div>
+  <div class="card">
+    <div class="cl">I give permission for my de-identified responses to be archived in the 4TU.ResearchData repository. I understand I can take part without agreeing to this.</div>
+    <div class="pills" id="c4-pills"></div>
+  </div>
+  <div class="btnrow"><span></span><button class="btn btn-p" onclick="next()">Get Started →</button></div>
+</div>
+
+<!-- ═══ STEP 1 — ABOUT YOU ═══ -->
+<div class="step" id="s1">
+  <div class="sh"><div class="sn">About you</div><div class="st">Professional Background</div><div class="sd">Used to describe the range of expertise represented in the study.</div></div>
+  <div class="card"><div class="cl">Primary professional role <span class="req">*</span></div><div class="pills" id="role-pills"></div></div>
+  <div class="card"><div class="cl">Years of experience in your field <span class="req">*</span></div><div class="pills" id="exp-pills"></div></div>
+  <div class="card"><div class="cl">Country or region of your primary work <span class="req">*</span></div><input type="text" id="country" placeholder="e.g. Netherlands, Southeast Asia"></div>
+  <div class="card"><div class="cl">Areas of expertise <span class="req">*</span></div><div class="ch">Select all that apply. This tells you which factor groups later on are most relevant to you.</div><div class="pills" id="expertise-pills"></div></div>
+  <div class="btnrow"><span></span><button class="btn btn-p" onclick="next()">Continue →</button></div>
+</div>
+
+<!-- ═══ STEP 2 — YOUR PROJECT ═══ -->
+<div class="step" id="s2">
+  <div class="sh"><div class="sn">Your project</div><div class="st">Project Details</div><div class="sd">The more detail you provide, the richer our analysis.</div></div>
+  <div class="card"><div class="cl">Project name <span class="req">*</span></div><input type="text" id="projectName" placeholder="e.g. Maldives Floating City"></div>
+  <div class="card"><div class="cl">Location (City, Country) <span class="req">*</span></div><input type="text" id="location" placeholder="e.g. Malé, Maldives"></div>
+  <div class="card"><div class="cr">
+    <div><div class="cl">Project type <span class="req">*</span></div><select id="projectType"><option value="">Select...</option><option>Floating housing</option><option>Amphibious housing</option><option>Mixed-use development</option><option>Infrastructure / public project</option><option>Other</option></select></div>
+    <div><div class="cl">Project status <span class="req">*</span></div><select id="projectStatus"><option value="">Select...</option><option>Concept / proposal</option><option>Pilot project</option><option>Implemented</option><option>Replicated / scaled</option><option>Not sure</option></select></div>
+  </div></div>
+  <div class="card"><div class="cr">
+    <div><div class="cl">Development scale <span class="req">*</span></div><select id="devScale"><option value="">Select...</option><option>Single building / structure</option><option>Neighbourhood</option><option>City / region</option></select></div>
+    <div><div class="cl">Primary use <span class="req">*</span></div><select id="primaryUse"><option value="">Select...</option><option>Permanent residential</option><option>Temporary / seasonal residential</option><option>Mixed use</option><option>Public / civic</option><option>Commercial</option><option>Other</option></select></div>
+  </div></div>
+  <div class="card"><div class="cr">
+    <div><div class="cl">Number of units or structures <span class="req">*</span></div><select id="units"><option value="">Select...</option><option>1 (single structure)</option><option>2–10</option><option>11–50</option><option>51–200</option><option>More than 200</option><option>Not applicable / Not sure</option></select></div>
+    <div><div class="cl">Year completed (or expected)</div><input type="number" id="year" placeholder="e.g. 2024" min="1980" max="2040"></div>
+  </div></div>
+  <div class="card"><div class="cr">
+    <div><div class="cl">Site area</div><select id="area"><option value="">Select...</option><option>Less than 0.1 ha</option><option>0.1–1 ha</option><option>1–5 ha</option><option>5–20 ha</option><option>More than 20 ha</option><option>Not sure</option></select></div>
+    <div><div class="cl">Total budget (EUR)</div><select id="budget"><option value="">Select...</option><option>Less than €1M</option><option>€1–10M</option><option>€10–50M</option><option>€50–200M</option><option>More than €200M</option><option>Prefer not to say / Not sure</option></select></div>
+  </div></div>
+  <div class="card"><div class="cl">Number of users / beneficiaries</div><select id="users"><option value="">Select...</option><option>Less than 10</option><option>10–50</option><option>50–200</option><option>200–1000</option><option>More than 1000</option><option>Not applicable / Not sure</option></select></div>
+  <div class="card"><div class="cl">Your relationship to this project <span class="req">*</span></div><div class="pills" id="rel-pills"></div></div>
+  <div class="card"><div class="cl">Are you affiliated with this project? <span class="req">*</span></div><div class="ch">We ask this so that any potential bias is transparent in the analysis.</div><div class="pills" id="aff-pills"></div></div>
+  <div class="btnrow"><span></span><button class="btn btn-p" onclick="next()">Continue to Scoring →</button></div>
+</div>
+
+<div class="step" id="s3"></div>
+<div class="step" id="s4"></div>
+<div class="step" id="s5"></div>
+<div class="step" id="s6"></div>
+<div class="step" id="s7"></div>
+<div class="step" id="s8"></div>
+<div class="step" id="s9"></div>
+
+<!-- ═══ STEP 10 — CRITICAL FACTORS ═══ -->
+<div class="step" id="s10">
+  <div class="sh"><div class="sn">In your own words</div><div class="st">What mattered most</div><div class="sd">Two questions about the factors behind the ratings you just gave.</div></div>
+  <div class="card">
+    <div class="cl">Which two or three factors were most critical for your project, and why? <span class="req">*</span></div>
+    <div class="ch">Name the factors and give a sentence on each. This is the most valuable part of your response.</div>
+    <textarea id="critical" rows="5" placeholder="e.g. Permitting pathway — there was no legal classification for floating dwellings, so approval took three years..."></textarea>
+  </div>
+  <div class="card">
+    <div class="cl">Are there factors missing from the lists that influenced regulatory decisions for your project?</div>
+    <textarea id="missingfac" placeholder="Optional — anything we should consider adding..."></textarea>
+  </div>
+  <div class="btnrow"><span></span><button class="btn btn-p" onclick="next()">Continue →</button></div>
+</div>
+
+<!-- ═══ STEP 11 — REFERENCE PROJECT ═══ -->
+<div class="step" id="s11">
+  <div class="sh"><div class="sn">Bonus round — 2 minutes</div><div class="st">Rate a well-known project</div><div class="sd">This lets us compare expert and researcher scores on the same project — the strongest test of the method. Entirely optional.</div></div>
+  <div class="card" style="background:linear-gradient(to right,#E6FFFA,#EFF6FF);border-color:#B2DFDB">
+    <p style="font-size:13px;color:var(--navy)"><strong>Why this matters:</strong> if you and our researcher both scored the same project, we can measure how consistently the framework performs across different assessors.</p>
+  </div>
+  <div class="card">
+    <div class="cl">Select a Phase 1 project you know well enough to rate</div>
+    <select id="p1Project" onchange="toggleP1()">
+      <option value="">Select a project...</option>
+      <option value="skip">Skip — I don't know any of these well enough</option>
+      <option value="IJburg Floating Houses">IJburg Floating Houses (Amsterdam, NL)</option>
+      <option value="Schoonschip">Schoonschip (Amsterdam, NL)</option>
+      <option value="Maasbommel">Maasbommel Amphibious Houses (NL)</option>
+      <option value="Lofts Nassauhaven">Lofts Nassauhaven (Rotterdam, NL)</option>
+      <option value="Drijf in Lelystad">Drijf in Lelystad (NL)</option>
+      <option value="UK Amphibious House">UK First Amphibious House (Marlow, UK)</option>
+      <option value="Lake Union Floating Homes">Lake Union Floating Homes (Seattle, USA)</option>
+      <option value="Beach Pavilion">Beach Pavilion (Szczecin, PL)</option>
+      <option value="Aquavilla">Aquavilla (Malmö, SE)</option>
+      <option value="Sjögången">Sjögången (Gothenburg, SE)</option>
+    </select>
+  </div>
+  <div id="p1-scoring" style="display:none">
+    <div class="card">
+      <div class="cl" style="margin-bottom:3px">Rate this project on the ten criteria</div>
+      <div class="ch">Overall ratings only — same 1–5 scale as before</div>
+      <div id="p1-list"></div>
+    </div>
+  </div>
+  <div class="btnrow"><span></span><button class="btn btn-p" onclick="next()">Continue →</button></div>
+</div>
+
+<!-- ═══ STEP 12 — FINAL ═══ -->
+<div class="step" id="s12">
+  <div class="sh"><div class="sn">Final thoughts</div><div class="st">Almost done</div><div class="sd">All optional.</div></div>
+  <div class="card"><div class="cl">Are there important factors influencing scalability not captured by the ten criteria?</div><textarea id="missing" placeholder="Optional..."></textarea></div>
+  <div class="card"><div class="cl">Any additional comments on the scalability of the project you assessed?</div><textarea id="comments" placeholder="Optional..."></textarea></div>
+  <div class="card"><div class="cl">Would you be willing to take part in a follow-up online interview of approximately 30–45 minutes?</div><div class="pills" id="int-pills"></div></div>
+  <div class="card"><div class="cl">May we contact you again in early 2027 to comment on the aggregated findings?</div><div class="pills" id="r2-pills"></div></div>
+  <div class="card" style="border-color:#B2DFDB;background:#FAFFFE">
+    <div class="cl">Email address — optional</div>
+    <div class="ch">Leave blank if you prefer to remain anonymous. Used only to send your scorecard and, if you agreed above, to contact you about the interview or follow-up round. Stored separately from your answers and deleted by December 2027.</div>
+    <input type="email" id="email" placeholder="your@email.com">
+  </div>
+  <div class="btnrow"><span></span><button class="btn btn-p" onclick="next()">See Your Scorecard →</button></div>
+</div>
+
+<!-- ═══ EXIT SCREEN (consent declined) ═══ -->
+<div class="step" id="sExit">
+  <div class="card" style="text-align:center;padding:40px 28px;border-color:#E2E8F0">
+    <div style="font-size:40px;margin-bottom:12px">🙏</div>
+    <h2 style="font-size:20px;color:var(--navy);margin-bottom:10px">Thank you for your time</h2>
+    <p style="font-size:14px;color:var(--mu);max-width:430px;margin:0 auto 14px">
+      Consent to both of the first two statements is required in order to take part, so the survey
+      ends here. No information has been recorded.</p>
+    <p style="font-size:13px;color:var(--mu);max-width:430px;margin:0 auto 20px">
+      If you changed your mind, or ticked something by accident, you can go back and continue.</p>
+    <button class="btn btn-s" onclick="show(0)">← Back to consent</button>
+    <p style="font-size:12px;color:var(--mu);margin-top:22px">
+      Questions about the research? <a href="mailto:B.K.George@tudelft.nl" style="color:var(--blue)">B.K.George@tudelft.nl</a></p>
+  </div>
+</div>
+
+<!-- ═══ STEP 13 — SCORECARD & SUBMIT ═══ -->
+<div class="step" id="s13">
+  <div id="sc-content"></div>
+  <div class="sub-area">
+    <button class="subbtn" id="subbtn" onclick="submitNow()">Submit Your Response ✓</button>
+    <div class="subnote">Your scorecard above is yours to keep — screenshot it if you like. Pressing submit opens an email to the research team; nothing is sent until you press send.</div>
+  </div>
+</div>
+
+</div>
+
+<div class="foot">
+  <p>PhD Research — Scalability of Floating and Amphibious Urban Housing</p>
+  <p>Ben K. George &amp; Nanma Gireesh — <a href="mailto:B.K.George@tudelft.nl">B.K.George@tudelft.nl</a> — TU Delft, Department of Urbanism</p>
+</div>
+
+<script>
+/* ════════ DATA ════════ */
+const CRIT=[
+ {k:'R',n:'Replicability',d:'H',def:'The project concept and technology can be reproduced elsewhere <strong>in their original form</strong>, without substantive modification. Focus on copy-as-is feasibility.',
+  subs:[{t:'Documentation completeness',d:'Technical specs, drawings and manuals available for replication'},
+        {t:'Modularity & standardization of components',d:'Replicable units rather than bespoke, one-off design'},
+        {t:'Independence from site-specific conditions',d:'Works without unusual local prerequisites'}]},
+ {k:'A',n:'Adaptability',d:'H',def:'The project can be <strong>modified or reconfigured</strong> to fit different geographic, climatic, regulatory or socio-economic contexts.',
+  note:'Replicability and adaptability are distinct. Replicability = reproducing without change. Adaptability = the ability to change while preserving function. A project may score high on one and low on the other.',
+  subs:[{t:'Design flexibility under modification',d:'Form and layout can be adjusted'},
+        {t:'Material and technology substitutability',d:'Alternative materials and systems work'},
+        {t:'Responsiveness to different contexts',d:'Adapts to different climatic, regulatory and socio-cultural settings'}]},
+ {k:'E',n:'Ease of Implementation',d:'H',def:'The project can be delivered with <strong>available skills, technology, supply chains and timelines</strong>.',
+  subs:[{t:'Construction complexity',d:'Simpler construction scores higher'},
+        {t:'Required expertise availability',d:'Less specialised expertise scores higher'},
+        {t:'Implementation timeline feasibility',d:'Shorter, more predictable timelines score higher'},
+        {t:'Supply-chain accessibility',d:'Required components are readily available'}]},
+ {k:'RE',n:'Resource Efficiency',d:'H',def:'The project uses <strong>financial, material and energy resources efficiently</strong> per unit delivered.',
+  subs:[{t:'Cost-effectiveness',d:'Relative to comparable land-based alternatives'},
+        {t:'Material efficiency',d:'Low waste, optimised use of materials'},
+        {t:'Energy performance',d:'Operational energy efficiency'}]},
+ {k:'CE',n:'Community Engagement',d:'H',def:'The project <strong>involves and benefits</strong> local communities and stakeholders.',
+  subs:[{t:'Participatory design',d:'Community involved in design decisions'},
+        {t:'Social acceptance',d:'Broader public acceptance of the project'},
+        {t:'User satisfaction',d:'Occupants and users satisfied with the outcome'}]},
+ {k:'P',n:'Policy & Regulatory Alignment',d:'V',def:'Existing <strong>policies and regulations actively support</strong> implementation — zoning, building codes and permits.',
+  subs:[{t:'Zoning compatibility',d:'Water/land use designation supports the project'},
+        {t:'Building code coverage',d:'Codes accommodate floating/amphibious typologies'},
+        {t:'Permit accessibility',d:'Permits obtainable through standard processes'}]},
+ {k:'IC',n:'Institutional Commitment',d:'V',def:'Government agencies and institutions <strong>actively support</strong> the project through political backing, budget allocation and inter-agency coordination.',
+  subs:[{t:'Political backing',d:'Sustained support from elected officials or leadership'},
+        {t:'Budget allocation',d:'Committed public or institutional funding'},
+        {t:'Inter-agency coordination',d:'Multiple agencies aligned in support'}]},
+ {k:'St',n:'Standardization',d:'V',def:'The project follows or contributes to <strong>standardized processes, SOPs, technical standards and quality benchmarks</strong> enabling consistent quality.',
+  subs:[{t:'Codified construction and operation processes',d:'Documented SOPs ensuring consistent quality'},
+        {t:'Adoption of recognised technical standards',d:'Uses established industry or regulatory standards'},
+        {t:'Defined quality benchmarks',d:'Performance criteria, certifications in place'}]},
+ {k:'Su',n:'Sustainability Integration',d:'V',def:'<strong>Environmental sustainability AND long-term financial/operational viability</strong> are integrated into design and operation.',
+  subs:[{t:'Energy performance',d:'Renewables, low operational energy'},
+        {t:'Ecological impact',d:'Biodiversity, water quality, local ecosystems'},
+        {t:'Circular materials use',d:'Reuse, recycling, low embodied carbon'},
+        {t:'Climate resilience',d:'Flood, storm, sea-level rise adaptation'},
+        {t:'Long-term financial/operational viability',d:'Funding secured, maintenance plans, market demand'}]},
+ {k:'SC',n:'Systematic Coordination',d:'V',def:'<strong>Cross-sectoral coordination mechanisms AND monitoring &amp; evaluation systems</strong> are in place to support the project.',
+  subs:[{t:'Multi-stakeholder governance',d:'Formal arrangements for cross-stakeholder decision-making'},
+        {t:'Integrated planning across sectors',d:'Housing, water, infrastructure planning aligned'},
+        {t:'Knowledge-sharing networks',d:'Between projects, regions and disciplines'},
+        {t:'Monitoring & evaluation systems',d:'Environmental impact and performance monitoring in place'}]},
+];
+
+const PESTLE=[
+ {k:'POL',n:'Political factors',link:'Institutional Commitment',
+  f:['Policy priorities','Governance structure','Institutional coordination','Institutional capacity','Political / public-sector acceptance','Policy continuity / stability']},
+ {k:'ECO',n:'Economic factors',link:'Resource Efficiency',
+  f:['Capital cost','Lifecycle cost','Affordability','Financing','Insurance / risk transfer','Avoided flood losses / benefits','Economic scalability']},
+ {k:'SOC',n:'Social factors',link:'Community Engagement',
+  f:['Public acceptance','Risk perception / trust','Equity / inclusion','Accessibility / vulnerable users','Livelihood compatibility','Cultural / settlement compatibility','Local skills / maintenance capacity']},
+ {k:'TEC',n:'Technological factors',link:'Ease of Implementation',
+  f:['Buoyancy / flotation performance','Stability','Guidance / mooring / positional control','Structural reliability','Utilities / sanitation','Durability / maintenance','Emergency performance','Technology maturity']},
+ {k:'LEG',n:'Legal factors',link:'Policy & Regulatory Alignment',
+  f:['Legal classification','Permitting / approval pathway','Technical standards availability','Liability / responsibility','Property / land / water rights','Alternative compliance mechanism','Regulatory compatibility']},
+ {k:'ENV',n:'Environmental factors',link:'Sustainability Integration',
+  f:['Hydrological impacts','Ecosystem / wetland impacts','Erosion / sedimentation','Water quality / wastewater','Resource / material impacts','Cumulative impacts']},
+ {k:'CC',n:'Cross-cutting factors',link:null,
+  f:['Replicability of the concept or technology','Adaptability to different contexts','Availability of standardized processes and benchmarks','Cross-sectoral coordination and monitoring']},
+];
+
+const P1={R:3.27,A:3.93,E:3.40,RE:3.33,CE:3.80,P:3.27,IC:3.47,St:3.33,Su:3.80,SC:3.73};
+const KEYS=CRIT.map(c=>c.k);
+const S5=[['1','Very Low'],['2','Low'],['3','Moderate'],['4','High'],['5','Very High']];
+const S4=[['1','Not relevant'],['2','Somewhat'],['3','Relevant'],['4','Highly relevant']];
+
+const scores={},subScores={},factorScores={},p1Scores={};
+let cur=0; const TOTAL=14;
+
+/* ════════ PILLS ════════ */
+function pills(id,opts,name){
+  const el=document.getElementById(id); if(!el)return;
+  el.innerHTML=opts.map((o,i)=>`<span class="pill"><input type="radio" name="${name}" id="${name}_${i}" value="${o}"><label for="${name}_${i}">${o}</label></span>`).join('');
+}
+pills('c1-pills',['Yes, I consent','No'],'c1');
+pills('c2-pills',['Yes','No'],'c2');
+pills('c3-pills',['Yes','No'],'c3');
+pills('c4-pills',['Yes','No'],'c4');
+pills('role-pills',['Researcher / Academic','Architect / Designer','Engineer','Developer / Industry','Policy / Government','Consultant','Other'],'role');
+pills('exp-pills',['< 5 years','5–10 years','10–20 years','20+ years'],'exp');
+pills('expertise-pills',['Technical / Design','Policy / Governance','Legal / Regulatory','Finance / Economics','Environmental / Ecological','Social / Community','Research / Academia','Other'],'expertise');
+pills('rel-pills',['Directly involved','Indirectly involved','Familiar through research','Other'],'rel');
+pills('aff-pills',['Yes','No'],'aff');
+pills('int-pills',['Yes','No','Maybe — send more info'],'int');
+pills('r2-pills',['Yes','No'],'r2');
+
+/* ════════ BUILD CRITERIA STEPS (s3–s7) ════════ */
+const groups=[[0,1],[2,3],[4,5],[6,7],[8,9]];
+groups.forEach((g,gi)=>{
+  const el=document.getElementById('s'+(gi+3));
+  const c1=CRIT[g[0]],c2=CRIT[g[1]];
+  const isH=c1.d==='H';
+  const dimLabel=isH?'Horizontal Scalability — Scaling Out':'Vertical Scalability — Scaling Up';
+  const dimDesc=isH
+    ?'Horizontal scaling captures the replication, diffusion and adaptation of successful innovations across new sites, populations or geographies.'
+    :'Vertical scaling captures the institutionalisation of innovations into policies, legal frameworks, governance systems and funding streams.';
+  let h=`<div class="sh">
+    <div class="sn">${dimLabel} — ${gi+1} of 5</div>
+    <div class="st">${c1.n} &amp; ${c2.n}</div>
+    <div class="sd">Scale: 1 = Very Low / Absent → 5 = Very High</div>
+  </div>
+  <div class="dim-info ${isH?'di-h':'di-v'}"><strong>${dimLabel}</strong>${dimDesc}</div>`;
+  [c1,c2].forEach(c=>{
+    h+=`<div class="crit">
+      <div class="crit-h">
+        <div style="flex:1"><div class="crit-n">${c.n} <span class="req">*</span></div></div>
+        <span class="badge ${c.d==='H'?'b-h':'b-v'}">${c.d==='H'?'HORIZONTAL':'VERTICAL'}</span>
+      </div>
+      <div class="crit-d">${c.def}</div>
+      ${c.note?`<div class="note">⚠️ ${c.note}</div>`:''}
+      <div class="ov">
+        <div class="ovl">Overall rating <span class="req">*</span></div>
+        <div class="sb">${S5.map(([v,t])=>`<button class="sbtn" onclick="setScore('${c.k}',${v},this)"><span class="n">${v}</span><span class="t">${t}</span></button>`).join('')}</div>
+      </div>
+      <div class="subs">
+        <div class="subh">Sub-criteria <span class="o">(optional — helps our deeper analysis)</span></div>
+        ${c.subs.map((s,si)=>`<div class="srow">
+          <span class="slab"><strong>${s.t}</strong><span class="d">${s.d}</span></span>
+          <div class="sbtns">${S5.map(([v])=>`<button class="mini" onclick="setSub('${c.k}',${si},${v},this)">${v}</button>`).join('')}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  h+=`<div class="btnrow"><span></span><button class="btn btn-p" onclick="next()">Continue →</button></div>`;
+  el.innerHTML=h;
+});
+
+/* ════════ BUILD FACTOR STEPS (s8–s9) ════════ */
+const fgroups=[[0,1,2],[3,4,5,6]];
+fgroups.forEach((g,gi)=>{
+  const el=document.getElementById('s'+(gi+8));
+  let h=`<div class="sh">
+    <div class="sn">Regulatory factors — ${gi+1} of 2</div>
+    <div class="st">What influences regulatory decisions</div>
+    <div class="sd">Thinking about the project you described, and about floating and amphibious development in your context more generally — how relevant was each factor to regulatory decision-making?</div>
+  </div>
+  <div class="dim-info di-v">
+    <strong>Please note — this scale runs 1 to 4</strong>
+    Complete the groups that fall within your expertise and skip the rest. All groups are optional, and most respondents complete two or three.
+  </div>`;
+  g.forEach(fi=>{
+    const f=PESTLE[fi];
+    h+=`<div class="fgroup">
+      <div class="fg-h">${f.n}</div>
+      <div class="fg-s">${f.link?'Relates to the '+f.link+' rating you gave earlier. Skip if outside your expertise.':'How relevant were these to regulatory decision-making?'}</div>
+      <div class="scale-key">${S4.map(([v,t])=>`<span><b>${v}</b> ${t}</span>`).join('&nbsp;·&nbsp;')}</div>
+      ${f.f.map((fac,ri)=>`<div class="srow">
+        <span class="slab">${fac}</span>
+        <div class="sbtns">${S4.map(([v])=>`<button class="mini p4" onclick="setFactor('${f.k}',${ri},${v},this)">${v}</button>`).join('')}</div>
+      </div>`).join('')}
+    </div>`;
+  });
+  h+=`<div class="btnrow"><span class="skipnote">All optional — skip anything outside your expertise</span><button class="btn btn-p" onclick="next()">Continue →</button></div>`;
+  el.innerHTML=h;
+});
+
+/* ════════ P1 REFERENCE LIST ════════ */
+(function(){
+  const el=document.getElementById('p1-list'); if(!el)return;
+  el.innerHTML=CRIT.map(c=>`<div class="srow">
+    <span class="slab"><span class="badge ${c.d==='H'?'b-h':'b-v'}" style="font-size:9px;padding:1px 6px">${c.d}</span> <strong>${c.n}</strong></span>
+    <div class="sbtns">${S5.map(([v])=>`<button class="mini" onclick="setP1('${c.k}',${v},this)">${v}</button>`).join('')}</div>
+  </div>`).join('');
+})();
+
+/* ════════ HANDLERS ════════ */
+function setScore(k,v,b){scores[k]=v;b.parentElement.querySelectorAll('.sbtn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')}
+function setSub(k,i,v,b){if(!subScores[k])subScores[k]={};subScores[k][i]=v;b.parentElement.querySelectorAll('.mini').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')}
+function setFactor(k,i,v,b){if(!factorScores[k])factorScores[k]={};factorScores[k][i]=v;b.parentElement.querySelectorAll('.mini').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')}
+function setP1(k,v,b){p1Scores[k]=v;b.parentElement.querySelectorAll('.mini').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')}
+function toggleP1(){const s=document.getElementById('p1Project').value;document.getElementById('p1-scoring').style.display=(s&&s!=='skip')?'block':'none'}
+
+/* ════════ NAVIGATION ════════ */
+const LABELS=['','About You','Your Project','Scoring 1/5','Scoring 2/5','Scoring 3/5','Scoring 4/5','Scoring 5/5','Factors 1/2','Factors 2/2','Key Factors','Reference','Final','Scorecard'];
+
+function show(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  const el=(n==='exit')?document.getElementById('sExit'):document.getElementById('s'+n);
+  el.classList.add('active');
+  clearErr();
+  const p=document.getElementById('prog');
+  if(n===0||n==='exit'){p.style.display='none';document.getElementById('hero').style.display=(n===0?'':'none')}
+  else{p.style.display='';document.getElementById('hero').style.display='none'}
+  if(n!=='exit'){
+    cur=n;
+    document.getElementById('pfill').style.width=Math.round(n/TOTAL*100)+'%';
+    document.getElementById('ptx').textContent=LABELS[n]||'';
+    if(n===13)buildScorecard();
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showErr(msg){
+  const b=document.getElementById('errbanner');
+  b.textContent=msg; b.classList.add('on');
+  b.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function clearErr(){
+  document.getElementById('errbanner').classList.remove('on');
+  document.querySelectorAll('.card.err,.crit.err').forEach(e=>e.classList.remove('err'));
+}
+function markErr(sel){
+  const e=typeof sel==='string'?document.getElementById(sel):sel;
+  if(!e)return;
+  const box=e.closest('.card')||e.closest('.crit');
+  if(box)box.classList.add('err');
+}
+function radioVal(n){const e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:''}
+
+function validate(n){
+  clearErr();
+  const missing=[];
+  if(n===0){
+    const c1=radioVal('c1'),c2=radioVal('c2');
+    if(!c1){markErr('c1-pills');missing.push('the first consent question')}
+    if(!c2){markErr('c2-pills');missing.push('the second consent question')}
+    if(missing.length){showErr('Please answer '+missing.join(' and ')+' before continuing.');return false}
+    if(c1==='No'||c2==='No'){show('exit');return false}
+    return true;
+  }
+  if(n===1){
+    if(!radioVal('role')){markErr('role-pills');missing.push('your professional role')}
+    if(!radioVal('exp')){markErr('exp-pills');missing.push('years of experience')}
+    if(!document.getElementById('country').value.trim()){markErr('country');missing.push('country or region')}
+    if(!radioVal('expertise')){markErr('expertise-pills');missing.push('area of expertise')}
+  }
+  if(n===2){
+    [['projectName','the project name'],['location','the location'],['projectType','the project type'],
+     ['projectStatus','the project status'],['devScale','the development scale'],
+     ['primaryUse','the primary use'],['units','the number of units']].forEach(([id,lab])=>{
+      if(!document.getElementById(id).value.trim()){markErr(id);missing.push(lab)}
+    });
+    if(!radioVal('rel')){markErr('rel-pills');missing.push('your relationship to the project')}
+    if(!radioVal('aff')){markErr('aff-pills');missing.push('whether you are affiliated')}
+  }
+  if(n>=3&&n<=7){
+    const g=[[0,1],[2,3],[4,5],[6,7],[8,9]][n-3];
+    g.forEach(i=>{
+      const c=CRIT[i];
+      if(!scores[c.k]){
+        const step=document.getElementById('s'+n);
+        const crits=step.querySelectorAll('.crit');
+        const idx=g.indexOf(i);
+        if(crits[idx])crits[idx].classList.add('err');
+        missing.push(c.n);
+      }
+    });
+    if(missing.length){showErr('Please give an overall rating for: '+missing.join(' and ')+'.');return false}
+    return true;
+  }
+  if(n===10){
+    if(!document.getElementById('critical').value.trim()){
+      markErr('critical');
+      showErr('Please tell us which factors were most critical for your project — this is the most valuable part of your response.');
+      return false;
+    }
+    return true;
+  }
+  if(missing.length){
+    showErr('Please complete: '+missing.join(', ')+'.');
+    return false;
+  }
+  return true;
+}
+
+function next(){ if(validate(cur)) show(cur+1); }
+function prev(){if(cur>0)show(cur-1)}
+
+/* ════════ RADAR ════════ */
+function radarSVG(us,p1,sz){
+  const cx=sz/2,cy=sz/2,maxR=sz/2-42,n=KEYS.length,step=2*Math.PI/n;
+  const pt=(i,v)=>{const a=i*step-Math.PI/2,r=v/5*maxR;return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
+  let s=`<svg viewBox="0 0 ${sz} ${sz+22}" xmlns="http://www.w3.org/2000/svg">`;
+  [1,2,3,4,5].forEach(v=>{s+=`<circle cx="${cx}" cy="${cy}" r="${v/5*maxR}" fill="none" stroke="#E2E8F0" stroke-width="0.5"/>`});
+  for(let i=0;i<n;i++){const[x,y]=pt(i,5);s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#E2E8F0" stroke-width="0.5"/>`}
+  s+=`<polygon points="${KEYS.map((k,i)=>pt(i,p1[k]).join(',')).join(' ')}" fill="rgba(37,99,168,0.08)" stroke="#2563A8" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  s+=`<polygon points="${KEYS.map((k,i)=>pt(i,us[k]||0).join(',')).join(' ')}" fill="rgba(13,148,136,0.12)" stroke="#0D9488" stroke-width="2.5"/>`;
+  KEYS.forEach((k,i)=>{const[x,y]=pt(i,us[k]||0);s+=`<circle cx="${x}" cy="${y}" r="4" fill="#0D9488"/>`});
+  KEYS.forEach((k,i)=>{const[x,y]=pt(i,5.65);s+=`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" font-family="Inter,Arial" fill="#374151" font-weight="600">${k}</text>`});
+  const ly=sz+9;
+  s+=`<rect x="${cx-122}" y="${ly}" width="10" height="10" rx="2" fill="rgba(13,148,136,0.3)" stroke="#0D9488" stroke-width="1.5"/>`;
+  s+=`<text x="${cx-108}" y="${ly+9}" font-size="10" font-family="Inter,Arial" fill="#64748B">Your project</text>`;
+  s+=`<rect x="${cx+22}" y="${ly}" width="10" height="10" rx="2" fill="rgba(37,99,168,0.15)" stroke="#2563A8" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+  s+=`<text x="${cx+36}" y="${ly+9}" font-size="10" font-family="Inter,Arial" fill="#64748B">Phase 1 avg (n=15)</text>`;
+  return s+'</svg>';
+}
+
+/* ════════ SCORECARD ════════ */
+function buildScorecard(){
+  const pn=document.getElementById('projectName').value||'Your Project';
+  const hK=['R','A','E','RE','CE'],vK=['P','IC','St','Su','SC'];
+  const hT=hK.reduce((s,k)=>s+(scores[k]||0),0),vT=vK.reduce((s,k)=>s+(scores[k]||0),0),tot=hT+vT;
+  const sorted=[...KEYS].sort((a,b)=>(scores[b]||0)-(scores[a]||0));
+  const nm=k=>CRIT.find(c=>c.k===k).n;
+  const rows=KEYS.map(k=>{
+    const v=scores[k]||0,p=P1[k],df=v-p;
+    const cl=df>0?'pos':df<0?'neg':'neu';
+    const dim=hK.includes(k)?'H':'V';
+    return`<tr><td>${nm(k)}</td><td style="text-align:center"><span class="badge ${dim==='H'?'b-h':'b-v'}" style="font-size:9px;padding:1px 7px">${dim}</span></td><td style="text-align:center;font-weight:700;color:var(--teal)">${v||'—'}</td><td style="text-align:center;color:var(--mu)">${p.toFixed(1)}</td><td style="text-align:center" class="${cl}">${df>0?'+':''}${df.toFixed(1)}</td></tr>`;
+  }).join('');
+  document.getElementById('sc-content').innerHTML=`
+    <div class="scorecard"><h2>Your Scalability Scorecard</h2><div class="pj">${pn}</div>
+      <div class="sgrid">
+        <div class="sbox"><div class="v tv">${tot}<span style="font-size:16px;opacity:.5">/50</span></div><div class="l">Total</div></div>
+        <div class="sbox"><div class="v" style="color:#93C5FD">${hT}<span style="font-size:16px;opacity:.5">/25</span></div><div class="l">Horizontal</div></div>
+        <div class="sbox"><div class="v" style="color:#C4B5FD">${vT}<span style="font-size:16px;opacity:.5">/25</span></div><div class="l">Vertical</div></div>
+      </div></div>
+    <div class="card"><h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px">Scalability Profile</h3><div class="radar">${radarSVG(scores,P1,380)}</div></div>
+    <div class="card"><h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:11px">Criterion Comparison</h3>
+      <table class="cmp"><tr><th>Criterion</th><th style="text-align:center">Dim</th><th style="text-align:center;color:var(--teal)">You</th><th style="text-align:center;color:var(--mu)">P1 avg</th><th style="text-align:center">Diff</th></tr>${rows}</table></div>
+    <div class="card" style="background:var(--lt)">
+      <p style="font-size:13px"><strong style="color:var(--green)">Top strengths:</strong> ${sorted.slice(0,3).map(k=>nm(k)+' ('+(scores[k]||0)+')').join(', ')}</p>
+      <p style="font-size:13px;margin-top:4px"><strong style="color:var(--amber)">Areas for attention:</strong> ${sorted.slice(-3).map(k=>nm(k)+' ('+(scores[k]||0)+')').join(', ')}</p></div>`;
+}
+
+/* ════════ SUBMIT — email only, no third party ════════ */
+function collect(){
+  const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
+  const gr=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:''};
+  const L=[];
+  L.push('SCALABILITY OF FLOATING AND AMPHIBIOUS URBAN DEVELOPMENTS');
+  L.push('Phase 2 Expert Validation Survey — response');
+  L.push('Submitted: '+new Date().toISOString());
+  L.push('');
+  L.push('--- CONSENT ---');
+  L.push('Consent to participate\t'+gr('c1'));
+  L.push('Use in two doctoral studies\t'+gr('c2'));
+  L.push('Anonymous quotation\t'+gr('c3'));
+  L.push('Archiving in 4TU.ResearchData\t'+gr('c4'));
+  L.push('');
+  L.push('--- RESPONDENT ---');
+  L.push('Role\t'+gr('role'));
+  L.push('Experience\t'+gr('exp'));
+  L.push('Country/region\t'+gv('country'));
+  L.push('Expertise\t'+gr('expertise'));
+  L.push('');
+  L.push('--- PROJECT ---');
+  [['Name','projectName'],['Location','location'],['Type','projectType'],['Status','projectStatus'],
+   ['Development scale','devScale'],['Primary use','primaryUse'],['Units','units'],['Year','year'],
+   ['Site area','area'],['Budget','budget'],['Users','users']].forEach(([lab,id])=>L.push(lab+'\t'+gv(id)));
+  L.push('Relationship\t'+gr('rel'));
+  L.push('Affiliated\t'+gr('aff'));
+  L.push('');
+  L.push('--- CRITERIA (1-5) ---');
+  CRIT.forEach(c=>{
+    L.push(c.n+' [OVERALL]\t'+(scores[c.k]||''));
+    c.subs.forEach((s,i)=>L.push('   '+s.t+'\t'+((subScores[c.k]&&subScores[c.k][i])||'')));
+  });
+  L.push('');
+  L.push('--- REGULATORY FACTORS (1-4) ---');
+  PESTLE.forEach(f=>{
+    L.push('['+f.n+']');
+    f.f.forEach((fac,i)=>L.push('   '+fac+'\t'+((factorScores[f.k]&&factorScores[f.k][i])||'')));
+  });
+  L.push('');
+  L.push('--- KEY FACTORS ---');
+  L.push('Most critical factors and why:');
+  L.push(gv('critical')||'(blank)');
+  L.push('');
+  L.push('Missing regulatory factors:');
+  L.push(gv('missingfac')||'(blank)');
+  L.push('');
+  L.push('--- REFERENCE PROJECT ---');
+  const rp=gv('p1Project');
+  L.push('Project\t'+(rp||'(none selected)'));
+  if(rp&&rp!=='skip'){CRIT.forEach(c=>L.push(c.n+'\t'+(p1Scores[c.k]||'')))}
+  L.push('');
+  L.push('--- FINAL ---');
+  L.push('Missing scalability factors:');
+  L.push(gv('missing')||'(blank)');
+  L.push('');
+  L.push('Additional comments:');
+  L.push(gv('comments')||'(blank)');
+  L.push('');
+  L.push('Willing to be interviewed\t'+gr('int'));
+  L.push('Contact for 2027 follow-up\t'+gr('r2'));
+  L.push('Email (optional)\t'+(gv('email')||'(not provided — anonymous)'));
+  return L.join('\n');
+}
+
+function buildTSV(){
+  const gv=id=>{const e=document.getElementById(id);return e?e.value.trim().replace(/[\t\n\r]/g,' '):''};
+  const gr=n=>{const e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:''};
+  const row=[];
+  row.push(new Date().toISOString());
+  row.push(gr('c1'),gr('c2'),gr('c3'),gr('c4'));
+  row.push(gr('role'),gr('exp'),gv('country'),gr('expertise'));
+  row.push(gv('projectName'),gv('location'),gv('projectType'),gv('projectStatus'),
+           gv('devScale'),gv('primaryUse'),gv('units'),gv('year'),gv('area'),gv('budget'),gv('users'));
+  row.push(gr('rel'),gr('aff'));
+  CRIT.forEach(c=>{
+    row.push(scores[c.k]||'');
+    c.subs.forEach((s,i)=>row.push((subScores[c.k]&&subScores[c.k][i])||''));
+  });
+  PESTLE.forEach(f=>{ f.f.forEach((fac,i)=>row.push((factorScores[f.k]&&factorScores[f.k][i])||'')) });
+  row.push(gv('critical'),gv('missingfac'));
+  row.push(gv('p1Project'));
+  CRIT.forEach(c=>row.push(p1Scores[c.k]||''));
+  row.push(gv('missing'),gv('comments'),gr('int'),gr('r2'),gv('email'));
+  return row.join('\t');
+}
+
+function buildHeaders(){
+  const h=['timestamp','consent_participate','consent_two_studies','consent_quote','consent_archive',
+           'role','experience','country','expertise',
+           'project_name','location','project_type','project_status','dev_scale','primary_use',
+           'units','year','site_area','budget','users','relationship','affiliated'];
+  CRIT.forEach(c=>{
+    h.push(c.k+'_overall');
+    c.subs.forEach((s,i)=>h.push(c.k+'_sub'+(i+1)));
+  });
+  PESTLE.forEach(f=>{ f.f.forEach((fac,i)=>h.push(f.k+'_'+(i+1))) });
+  h.push('critical_factors','missing_factors','p1_reference');
+  CRIT.forEach(c=>h.push('p1_'+c.k));
+  h.push('missing_criteria','comments','interview_willing','followup_2027','email');
+  return h.join('\t');
+}
+
+function submitNow(){
+  const data=collect();
+  const pn=(document.getElementById('projectName').value||'Project').trim();
+  const btn=document.getElementById('subbtn');
+
+  // put full response on clipboard as the reliable path
+  let copied=false;
+  try{
+    navigator.clipboard.writeText(data).then(()=>{copied=true}).catch(()=>{});
+  }catch(e){}
+
+  const subj=encodeURIComponent('Phase 2 survey response — '+pn);
+  const shortBody=encodeURIComponent(
+    'Dear Ben and Nanma,\n\nPlease find my survey response below.\n\n'+
+    '(If the response text does not appear here, it has been copied to your clipboard — '+
+    'please paste it into this email before sending, or copy it from the box on the page.)\n\n'+
+    '--------------------------------------------------\n\n');
+
+  btn.textContent='✓ Response ready';
+  btn.classList.add('done');
+
+  document.querySelector('.sub-area').innerHTML=`
+    <div style="padding:24px;background:#ECFDF5;border-radius:14px;text-align:center;margin-bottom:16px">
+      <div style="font-size:38px;margin-bottom:8px">📬</div>
+      <h3 style="font-size:19px;color:var(--navy);margin-bottom:6px">One last step</h3>
+      <p style="font-size:13.5px;color:var(--mu);max-width:450px;margin:0 auto 16px">
+        Your response is ready and has been copied to your clipboard. Click below to open an email to the
+        research team — paste your response in if it isn't already there, then press send.
+      </p>
+      <a href="mailto:B.K.George@tudelft.nl?cc=N.Gireesh@tudelft.nl&subject=${subj}&body=${shortBody}"
+         class="subbtn" style="display:inline-block;text-decoration:none;padding:14px 36px;font-size:15px">
+        Open email →</a>
+    </div>
+    <div class="card" style="text-align:left">
+      <div class="cl">Your response</div>
+      <div class="ch">If the clipboard didn't work, click inside the box, select all, and paste it into your
+        email to <strong>B.K.George@tudelft.nl</strong></div>
+      <textarea class="resp-box" id="respbox" readonly onclick="this.select()"></textarea>
+      <button class="btn btn-s" style="margin-top:10px;width:100%" onclick="copyAgain('respbox',this)">Copy response again</button>
+    </div>
+    <details class="card" style="text-align:left">
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--mu)">
+        Spreadsheet format — for the research team</summary>
+      <div class="ch" style="margin-top:10px">A single tab-separated row for pasting straight into a
+        spreadsheet. Respondents can ignore this.</div>
+      <textarea class="resp-box" id="tsvbox" readonly style="min-height:80px" onclick="this.select()"></textarea>
+      <button class="btn btn-s" style="margin-top:10px;width:100%" onclick="copyAgain('tsvbox',this)">Copy spreadsheet row</button>
+    </details>
+    <p style="font-size:12px;color:var(--mu);margin-top:14px;text-align:center">
+      Nothing has been sent yet. Your data goes directly to TU Delft by email — no third-party service is involved.</p>`;
+  document.getElementById('respbox').value=data;
+  document.getElementById('tsvbox').value=buildTSV();
+}
+
+function copyAgain(id,btn){
+  const t=document.getElementById(id);
+  t.select(); t.setSelectionRange(0,999999);
+  try{ navigator.clipboard.writeText(t.value); }catch(e){ document.execCommand('copy'); }
+  const old=btn.textContent;
+  btn.textContent='✓ Copied';
+  setTimeout(()=>{btn.textContent=old},2000);
+}
+
+/* Console helper: type copyHeaders() to get the spreadsheet header row */
+function copyHeaders(){
+  const h=buildHeaders();
+  try{ navigator.clipboard.writeText(h); }catch(e){}
+  console.log(h);
+  return 'Header row copied to clipboard.';
+}
+
+show(0);
+</script>
+</body>
+</html>
